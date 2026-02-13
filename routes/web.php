@@ -18,18 +18,18 @@ Route::middleware(['auth'])->group(function () {
 
     // halaman dashboard masing-masing role
     Route::middleware(['role:admin'])->get('/admin/dashboard', function () {
-        return view('dashboards.admin');
+        return view('users::dashboard');
     })->name('admin.dashboard');
 
     Route::middleware(['role:operator'])->get('/operator/dashboard', function () {
-        return view('dashboards.operator');
+        return view('template::dashboard');
     })->name('operator.dashboard');
 
     Route::middleware(['role:wadek'])->get('/wadek/dashboard', function () {
-        return view('dashboards.wadek');
+        return view('auth::dashboard');
     })->name('wadek.dashboard');
 
     Route::middleware(['role:mahasiswa'])->get('/mahasiswa/dashboard', function () {
-        return view('persetujuan::wadek');
+        return view('persetujuan::dashboard');
     })->name('mahasiswa.dashboard');
 });
