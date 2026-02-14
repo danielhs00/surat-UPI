@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Home | Mantis Bootstrap 5 Admin Template</title>
+  <title>Admin | Mahasiswa</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -55,14 +55,14 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
     </div>
     <div class="navbar-content">
       <ul class="pc-navbar">
-        <li class="pc-item active">
-          <a href="#" class="pc-link">
+        <li class="pc-item">
+          <a href="{{ route('admin.dashboard') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-            <span class="pc-mtext">Dashboard</span>
+            <span class="pc-mtext">Mahasiswa</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="{{ route('admin.mahasiswa') }}" class="pc-link">
+        <li class="pc-item active">
+          <a href="#" class="pc-link">
             <span class="pc-micon"><i class="fi fi-rr-user"></i></span>
             <span class="pc-mtext">Mahasiswa</span>
           </a>
@@ -333,50 +333,27 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
       <!-- [ breadcrumb ] end -->
       <!-- [ Main Content ] start -->
       <div class="row">
-        <!-- [ sample-page ] start -->
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Mahasiswa</h6>
-              <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Surat</h6>
-              <h4 class="mb-3">78,250 <span class="badge bg-light-success border border-success"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Order</h6>
-              <h4 class="mb-3">18,800 <span class="badge bg-light-warning border border-warning"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Sales</h6>
-              <h4 class="mb-3">$35,078 <span class="badge bg-light-danger border border-danger"></span></h4>
-            </div>
-          </div>
-        </div>
 
-        {{-- table pengajuan --}}
-        <div class="col-md-12 col-xl-8">
-          <h5 class="mb-3">Daftar Pengajuan</h5>
+        {{-- table mahasiswa --}}
+        <div class="col-md-12 col-2xl-8">
+          <h5 class="mb-3 fs-3">Daftar Mahasiswa</h5>
           <div class="card tbl-card">
             <div class="card-body">
-              <li class="pc-h-item d-none d-md-inline-flex">
-                <form class="header-search">
-                  <input type="search" id="searchInput" class="form-control" placeholder="Cari disini...">
-                </form>
-              </li>
+              <li class="pc-h-item d-none d-md-block">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <form class="header-search me-2">
+                            <input type="search" id="searchInput" class="form-control w-25" placeholder="Cari disini...">
+                        </form>
+                    </div>
+                    <div class="col-auto">
+                        <a href="#" class="btn btn-primary">Tambah Mahasiswa</a>
+                    </div>
+                </div>
+            </li>
+
+
+            
               <div class="table-responsive">
                 <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
                   <thead>
@@ -492,72 +469,12 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
             </div>
           </div>
         </div>
-        {{-- end table pengajuan --}}
-        
-        {{-- Transaction History --}}
-        <div class="col-md-12 col-xl-4">
-          <h5 class="mb-3">Transaction History</h5>
-          <div class="card">
-            <div class="list-group list-group-flush">
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-success bg-light-success">
-                      <i class="ti ti-gift f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #002434</h6>
-                    <p class="mb-0 text-muted">Today, 2:00 AM</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">+ $1,430</h6>
-                    <p class="mb-0 text-muted">78%</P>
-                  </div>
-                </div>
-              </a>
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-primary bg-light-primary">
-                      <i class="ti ti-message-circle f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #984947</h6>
-                    <p class="mb-0 text-muted">5 August, 1:45 PM</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">- $302</h6>
-                    <p class="mb-0 text-muted">8%</P>
-                  </div>
-                </div>
-              </a>
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-danger bg-light-danger">
-                      <i class="ti ti-settings f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #988784</h6>
-                    <p class="mb-0 text-muted">7 hours ago</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">- $682</h6>
-                    <p class="mb-0 text-muted">16%</P>
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
+            {{-- end table mahasiswa --}}
         </div>
-      </div>
+        </div>
     </div>
-  </div>
-  <!-- [ Main Content ] end -->
-  <footer class="pc-footer">
+    <!-- [ Main Content ] end -->
+    <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
         <div class="row">
             <div class="col-sm my-1">
