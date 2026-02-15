@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Admin | Mahasiswa</title>
+  <title>Admin | Tambah Mahasiswa</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -310,78 +310,122 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
 
   <!-- [ Main Content ] start -->
-  <div class="pc-container">
-    <div class="pc-content">
-      <!-- [ breadcrumb ] start -->
-      <div class="page-header">
-        <div class="page-block">
-          <div class="row align-items-center">
-            <div class="col-md-12">
-              <div class="page-header-title">
-                <h5 class="m-b-10">Mahasiswa</h5>
-              </div>
+<div class="pc-container">
+  <div class="pc-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Tambah Mahasiswa</h5>
             </div>
           </div>
         </div>
       </div>
-      <!-- [ breadcrumb ] end -->
-      <!-- [ Main Content ] start -->
-      <div class="row">
+    </div>
 
-        {{-- table mahasiswa --}}
-        <div class="col-md-12 col-2xl-8">
-          <h5 class="mb-3 fs-3">Daftar Mahasiswa</h5>
-          <div class="card tbl-card">
-            <div class="card-body">
-              <li class="pc-h-item d-none d-md-block">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <form class="header-search me-2">
-                            <input type="search" id="searchInput" class="form-control w-25" placeholder="Cari disini...">
-                        </form>
-                    </div>
-                    <div class="col-auto">
-                        <a href="{{ route('tambah.mahasiswa') }}" class="btn btn-primary">Tambah Mahasiswa</a>
-                    </div>
-                </div>
-            </li>
+    <!-- Form Section -->
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
 
+            <form action="{{ route('simpan.mahasiswa') }}" method="POST">
+              @csrf
 
-            
-              <div class="table-responsive">
-                <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>ID Mahasiswa</th>
-                      <th>Nama Mahasiswa</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th class="text-end">Tanggal Dibuat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                     @foreach ($mahasiswas as $index => $mahasiswa)
-                    <tr>
-                      <td>{{ $index + 1 }}</td>
-                      <td>{{ $mahasiswa->id }}</td>
-                      <td>{{ $mahasiswa->name }}</td>
-                      <td>{{ $mahasiswa->email }}</td>
-                      <td>{{ $mahasiswa->role }}</td>
-                      <td class="text-end">{{ $mahasiswa->created_at->format('d M Y') }}</td>
-                    </tr>
-                    @endforeach
-                  </tbody>
-                </table>
+              {{-- Nama --}}
+              <div class="mb-3">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" name="name" 
+                       class="form-control @error('name') is-invalid @enderror"
+                       value="{{ old('name') }}" required>
+                @error('name')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
               </div>
-            </div>
+
+              {{-- NIM --}}
+              <div class="mb-3">
+                <label class="form-label">NIM</label>
+                <input type="text" name="nim"
+                       class="form-control @error('nim') is-invalid @enderror"
+                       value="{{ old('nim') }}" required>
+                @error('nim')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Email --}}
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email"
+                       class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}" required>
+                @error('email')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Prodi --}}
+              <div class="mb-3">
+                <label class="form-label">Program Studi</label>
+                <input type="text" name="prodi"
+                       class="form-control @error('prodi') is-invalid @enderror"
+                       value="{{ old('prodi') }}" required>
+                @error('prodi')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Angkatan --}}
+              <div class="mb-3">
+                <label class="form-label">Angkatan</label>
+                <input type="number" name="angkatan"
+                       class="form-control @error('angkatan') is-invalid @enderror"
+                       value="{{ old('angkatan') }}" required>
+                @error('angkatan')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Password --}}
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password"
+                       class="form-control @error('password') is-invalid @enderror"
+                       required>
+                @error('password')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+              {{-- Konfirmasi Password --}}
+<div class="mb-3">
+  <label class="form-label">Konfirmasi Password</label>
+  <input type="password" name="password_confirmation"
+         class="form-control" required>
+</div>
+
+              <div class="d-flex justify-content-between">
+                <a href="{{ route('admin.mahasiswa') }}" class="btn btn-secondary">
+                  Kembali
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  Simpan
+                </button>
+              </div>
+
+            </form>
+
           </div>
         </div>
-            {{-- end table mahasiswa --}}
-        </div>
-        </div>
+      </div>
     </div>
-    <!-- [ Main Content ] end -->
+
+  </div>
+</div>
+<!-- [ Main Content ] end -->
     <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
         <div class="row">

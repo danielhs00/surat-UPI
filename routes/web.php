@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Users\Http\Controllers\UsersController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -18,11 +19,21 @@ Route::middleware(['auth'])->group(function () {
 
     // MULAI HALAMAN ADMIN
     Route::middleware(['role:admin'])->get('/admin/dashboard', function () {
-        return view('users::dashboard');
+        return view('users::index');
     })->name('admin.dashboard');
-    Route::middleware(['role:admin'])->get('/admin/mahasiswa', function () {
-        return view('users::mahasiswa');
-    })->name('admin.mahasiswa');
+
+    Route::middleware(['role:admin'])->get('/admin/mahasiswa', [UsersController::class, 'mahasiswa'])->name('admin.mahasiswa');
+
+     Route::middleware(['role:admin'])->get('/admin/operator', [UsersController::class, 'operator'])->name('admin.operator');
+
+     Route::middleware(['role:admin'])->get('/admin/wadek', [UsersController::class, 'wadek'])->name('admin.wadek');
+
+    Route::middleware(['role:admin'])->get('/admin/mahasiswa/tambah-mahasiswa', [UsersController::class, 'create'])->name('tambah.mahasiswa');
+
+    Route::post('admin/mahasiswa/simpan', [UsersController::class, 'store'])
+        ->name('simpan.mahasiswa');
+
+    
     // SELESAI HALAMAN ADMIN
 
 

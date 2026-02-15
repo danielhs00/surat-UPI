@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Home | Mantis Bootstrap 5 Admin Template</title>
+  <title>Admin | Tambah Mahasiswa</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -55,32 +55,26 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
     </div>
     <div class="navbar-content">
       <ul class="pc-navbar">
-        <li class="pc-item active">
-          <a href="#" class="pc-link">
+        <li class="pc-item">
+          <a href="{{ route('admin.dashboard') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
             <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="{{ route('admin.mahasiswa') }}" class="pc-link">
+        <li class="pc-item active">
+          <a href="#" class="pc-link">
             <span class="pc-micon"><i class="fi fi-rr-user"></i></span>
             <span class="pc-mtext">Mahasiswa</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-mail-opened"></i></span>
-            <span class="pc-mtext">Surat</span>
-          </a>
-        </li>
-        <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.operator') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-headset"></i></span>
             <span class="pc-mtext">Operator</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.wadek') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">Wakil Dekan</span>
           </a>
@@ -316,248 +310,123 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
 
   <!-- [ Main Content ] start -->
-  <div class="pc-container">
-    <div class="pc-content">
-      <!-- [ breadcrumb ] start -->
-      <div class="page-header">
-        <div class="page-block">
-          <div class="row align-items-center">
-            <div class="col-md-12">
-              <div class="page-header-title">
-                <h5 class="m-b-10">Dashboard</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- [ breadcrumb ] end -->
-      <!-- [ Main Content ] start -->
-      <div class="row">
-        <!-- [ sample-page ] start -->
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Mahasiswa</h6>
-              <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Surat</h6>
-              <h4 class="mb-3">78,250 <span class="badge bg-light-success border border-success"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Order</h6>
-              <h4 class="mb-3">18,800 <span class="badge bg-light-warning border border-warning"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Sales</h6>
-              <h4 class="mb-3">$35,078 <span class="badge bg-light-danger border border-danger"></span></h4>
-            </div>
-          </div>
-        </div>
+<div class="pc-container">
+  <div class="pc-content">
 
-        {{-- table pengajuan --}}
-        <div class="col-md-12 col-xl-8">
-          <h5 class="mb-3">Daftar Pengajuan</h5>
-          <div class="card tbl-card">
-            <div class="card-body">
-              <li class="pc-h-item d-none d-md-inline-flex">
-                <form class="header-search">
-                  <input type="search" id="searchInput" class="form-control" placeholder="Cari disini...">
-                </form>
-              </li>
-              <div class="table-responsive">
-                <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>No Pengajuan</th>
-                      <th>Nama Mahasiswa</th>
-                      <th>Jenis Surat</th>
-                      <th>Status</th>
-                      <th class="text-end">Tanggal Pengajuan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td>5</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>6</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>7</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td>8</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>9</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>10</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-        {{-- end table pengajuan --}}
-        
-        {{-- Transaction History --}}
-        <div class="col-md-12 col-xl-4">
-          <h5 class="mb-3">Transaction History</h5>
-          <div class="card">
-            <div class="list-group list-group-flush">
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-success bg-light-success">
-                      <i class="ti ti-gift f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #002434</h6>
-                    <p class="mb-0 text-muted">Today, 2:00 AM</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">+ $1,430</h6>
-                    <p class="mb-0 text-muted">78%</P>
-                  </div>
-                </div>
-              </a>
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-primary bg-light-primary">
-                      <i class="ti ti-message-circle f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #984947</h6>
-                    <p class="mb-0 text-muted">5 August, 1:45 PM</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">- $302</h6>
-                    <p class="mb-0 text-muted">8%</P>
-                  </div>
-                </div>
-              </a>
-              <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex">
-                  <div class="flex-shrink-0">
-                    <div class="avtar avtar-s rounded-circle text-danger bg-light-danger">
-                      <i class="ti ti-settings f-18"></i>
-                    </div>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-1">Order #988784</h6>
-                    <p class="mb-0 text-muted">7 hours ago</P>
-                  </div>
-                  <div class="flex-shrink-0 text-end">
-                    <h6 class="mb-1">- $682</h6>
-                    <p class="mb-0 text-muted">16%</P>
-                  </div>
-                </div>
-              </a>
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Tambah Mahasiswa</h5>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Form Section -->
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+
+            <form action="{{ route('simpan.mahasiswa') }}" method="POST">
+              @csrf
+
+              {{-- Nama --}}
+              <div class="mb-3">
+                <label class="form-label">Nama Lengkap</label>
+                <input type="text" name="name" 
+                       class="form-control @error('name') is-invalid @enderror"
+                       value="{{ old('name') }}" required>
+                @error('name')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- NIM --}}
+              <div class="mb-3">
+                <label class="form-label">NIM</label>
+                <input type="text" name="nim"
+                       class="form-control @error('nim') is-invalid @enderror"
+                       value="{{ old('nim') }}" required>
+                @error('nim')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Email --}}
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email"
+                       class="form-control @error('email') is-invalid @enderror"
+                       value="{{ old('email') }}" required>
+                @error('email')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Prodi --}}
+              <div class="mb-3">
+                <label class="form-label">Program Studi</label>
+                <input type="text" name="prodi"
+                       class="form-control @error('prodi') is-invalid @enderror"
+                       value="{{ old('prodi') }}" required>
+                @error('prodi')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Angkatan --}}
+              <div class="mb-3">
+                <label class="form-label">Angkatan</label>
+                <input type="number" name="angkatan"
+                       class="form-control @error('angkatan') is-invalid @enderror"
+                       value="{{ old('angkatan') }}" required>
+                @error('angkatan')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+
+              {{-- Password --}}
+              <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password"
+                       class="form-control @error('password') is-invalid @enderror"
+                       required>
+                @error('password')
+                  <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+              </div>
+              {{-- Konfirmasi Password --}}
+<div class="mb-3">
+  <label class="form-label">Konfirmasi Password</label>
+  <input type="password" name="password_confirmation"
+         class="form-control" required>
+</div>
+
+              <div class="d-flex justify-content-between">
+                <a href="{{ route('admin.mahasiswa') }}" class="btn btn-secondary">
+                  Kembali
+                </a>
+                <button type="submit" class="btn btn-primary">
+                  Simpan
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <!-- [ Main Content ] end -->
-  <footer class="pc-footer">
+</div>
+<!-- [ Main Content ] end -->
+    <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
         <div class="row">
             <div class="col-sm my-1">

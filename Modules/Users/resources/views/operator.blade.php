@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Admin | Mahasiswa</title>
+  <title>Admin | Operator</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -58,29 +58,23 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         <li class="pc-item">
           <a href="{{ route('admin.dashboard') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-dashboard"></i></span>
-            <span class="pc-mtext">Mahasiswa</span>
+            <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
-        <li class="pc-item active">
-          <a href="#" class="pc-link">
+        <li class="pc-item">
+          <a href="{{ route('admin.mahasiswa') }}" class="pc-link">
             <span class="pc-micon"><i class="fi fi-rr-user"></i></span>
             <span class="pc-mtext">Mahasiswa</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="#" class="pc-link">
-            <span class="pc-micon"><i class="ti ti-mail-opened"></i></span>
-            <span class="pc-mtext">Surat</span>
-          </a>
-        </li>
-        <li class="pc-item">
+        <li class="pc-item active">
           <a href="#" class="pc-link">
             <span class="pc-micon"><i class="ti ti-headset"></i></span>
             <span class="pc-mtext">Operator</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.wadek') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">Wakil Dekan</span>
           </a>
@@ -324,7 +318,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           <div class="row align-items-center">
             <div class="col-md-12">
               <div class="page-header-title">
-                <h5 class="m-b-10">Dashboard</h5>
+                <h5 class="m-b-10">Operator</h5>
               </div>
             </div>
           </div>
@@ -334,9 +328,9 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
       <!-- [ Main Content ] start -->
       <div class="row">
 
-        {{-- table mahasiswa --}}
+        {{-- table operator --}}
         <div class="col-md-12 col-2xl-8">
-          <h5 class="mb-3 fs-3">Daftar Mahasiswa</h5>
+          <h5 class="mb-3 fs-3">Daftar Operator</h5>
           <div class="card tbl-card">
             <div class="card-body">
               <li class="pc-h-item d-none d-md-block">
@@ -347,7 +341,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
                         </form>
                     </div>
                     <div class="col-auto">
-                        <a href="#" class="btn btn-primary">Tambah Mahasiswa</a>
+                        <a href="#" class="btn btn-primary">Tambah Operator</a>
                     </div>
                 </div>
             </li>
@@ -359,117 +353,31 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
                   <thead>
                     <tr>
                       <th>No</th>
-                      <th>No Pengajuan</th>
-                      <th>Nama Mahasiswa</th>
-                      <th>Jenis Surat</th>
-                      <th>Status</th>
-                      <th class="text-end">Tanggal Pengajuan</th>
+                      <th>No Operator</th>
+                      <th>Nama Operator</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th class="text-end">Tanggal Dibuat</th>
                     </tr>
                   </thead>
                   <tbody>
+                    @foreach ($operators as $index => $operator)
                     <tr>
-                      <td>1</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
+                      <td>{{ $index + 1 }}</td>
+                      <td>{{ $operator->id }}</td>
+                      <td>{{ $operator->name }}</td>
+                      <td>{{ $operator->email }}</td>
+                      <td>{{ $operator->role }}</td>
+                      <td class="text-end">{{ $operator->created_at->format('d M Y') }}</td>
                     </tr>
-                    <tr>
-                      <td>2</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td>5</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>6</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>7</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td>8</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>9</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td>10</td>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
+                    @endforeach
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-            {{-- end table mahasiswa --}}
+            {{-- end table operator --}}
         </div>
         </div>
     </div>
@@ -484,7 +392,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         </div>
         <div class="col-auto my-1">
           <ul class="list-inline footer-link mb-0">
-            <li class="list-inline-item">Mahasiswa</li>
+            <li class="list-inline-item">Operator</li>
           </ul>
         </div>
       </div>

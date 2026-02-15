@@ -61,8 +61,8 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
             <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
-        <li class="pc-item active">
-          <a href="#" class="pc-link">
+        <li class="pc-item">
+          <a href="{{ route('admin.mahasiswa') }}" class="pc-link">
             <span class="pc-micon"><i class="fi fi-rr-user"></i></span>
             <span class="pc-mtext">Mahasiswa</span>
           </a>
@@ -73,8 +73,8 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
             <span class="pc-mtext">Operator</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="{{ route('admin.wadek') }}" class="pc-link">
+        <li class="pc-item active">
+          <a href="#" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">Wakil Dekan</span>
           </a>
@@ -318,7 +318,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           <div class="row align-items-center">
             <div class="col-md-12">
               <div class="page-header-title">
-                <h5 class="m-b-10">Mahasiswa</h5>
+                <h5 class="m-b-10">Wakil Dekan</h5>
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
         {{-- table mahasiswa --}}
         <div class="col-md-12 col-2xl-8">
-          <h5 class="mb-3 fs-3">Daftar Mahasiswa</h5>
+          <h5 class="mb-3 fs-3">Daftar Wakil Dekan</h5>
           <div class="card tbl-card">
             <div class="card-body">
               <li class="pc-h-item d-none d-md-block">
@@ -353,22 +353,22 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
                   <thead>
                     <tr>
                       <th>No</th>
-                      <th>ID Mahasiswa</th>
-                      <th>Nama Mahasiswa</th>
+                      <th>ID Wakil Dekan</th>
+                      <th>Nama Wakil Dekan</th>
                       <th>Email</th>
                       <th>Status</th>
                       <th class="text-end">Tanggal Dibuat</th>
                     </tr>
                   </thead>
                   <tbody>
-                     @foreach ($mahasiswas as $index => $mahasiswa)
+                     @foreach ($wadeks as $index => $wadek)
                     <tr>
                       <td>{{ $index + 1 }}</td>
-                      <td>{{ $mahasiswa->id }}</td>
-                      <td>{{ $mahasiswa->name }}</td>
-                      <td>{{ $mahasiswa->email }}</td>
-                      <td>{{ $mahasiswa->role }}</td>
-                      <td class="text-end">{{ $mahasiswa->created_at->format('d M Y') }}</td>
+                      <td>{{ $wadek->id }}</td>
+                      <td>{{ $wadek->name }}</td>
+                      <td>{{ $wadek->email }}</td>
+                      <td>{{ $wadek->role }}</td>
+                      <td class="text-end">{{ $wadek->created_at->format('d M Y') }}</td>
                     </tr>
                     @endforeach
                   </tbody>

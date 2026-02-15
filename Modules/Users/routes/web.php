@@ -20,3 +20,8 @@ Route::middleware(['auth','role:admin'])
             return view('users::dashboard');
         })->name('admin.dashboard');
     });
+
+
+
+Route::get('/users/operator', [UsersController::class, 'index'])
+    ->name('users.operator');
