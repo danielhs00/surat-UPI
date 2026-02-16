@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Admin | Operator</title>
+  <title>Admin | Tambah Mahasiswa</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -68,13 +68,13 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           </a>
         </li>
         <li class="pc-item active">
-          <a href="#" class="pc-link">
+          <a href="{{ route('admin.operator') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-headset"></i></span>
             <span class="pc-mtext">Operator</span>
           </a>
         </li>
         <li class="pc-item">
-          <a href="{{ route('admin.wadek') }}" class="pc-link">
+          <a href="#" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">Wakil Dekan</span>
           </a>
@@ -310,88 +310,58 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
 
   <!-- [ Main Content ] start -->
-  <div class="pc-container">
-    <div class="pc-content">
-      <!-- [ breadcrumb ] start -->
-      <div class="page-header">
-        <div class="page-block">
-          <div class="row align-items-center">
-            <div class="col-md-12">
-              <div class="page-header-title">
-                <h5 class="m-b-10">Operator</h5>
-              </div>
+<div class="pc-container">
+  <div class="pc-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Edit Operator</h5>
             </div>
           </div>
         </div>
       </div>
-      <!-- [ breadcrumb ] end -->
-      <!-- [ Main Content ] start -->
-      <div class="row">
+    </div>
 
-        {{-- table operator --}}
-        <div class="col-md-12 col-2xl-8">
-          <h5 class="mb-3 fs-3">Daftar Operator</h5>
-          <div class="card tbl-card">
-            <div class="card-body">
-              <li class="pc-h-item d-none d-md-block">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <form class="header-search me-2">
-                            <input type="search" id="searchInput" class="form-control w-25" placeholder="Cari disini...">
-                        </form>
-                    </div>
-                    <div class="col-auto">
-                        <a href="{{ route('tambah.operator') }}" class="btn btn-primary">Tambah Operator</a>
-                    </div>
-                </div>
-            </li>
+    <!-- Form Section -->
+    <div class="row">
+      <div class="col-2xl-6">
+        <div class="card">
+          <div class="card-body">
 
+            <form action="{{ route('update.wadek',$user->id) }}" method="POST">
+                @csrf
+                @method('PUT')
 
-            
-              <div class="table-responsive">
-                <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>No Operator</th>
-                      <th>Nama Operator</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th class="text-end">Tanggal Dibuat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach ($operators as $index => $operator)
-                    <tr>
-                      <td>{{ $index + 1 }}</td>
-                      <td>{{ $operator->id }}</td>
-                      <td>{{ $operator->name }}</td>
-                      <td>{{ $operator->email }}</td>
-                      <td>{{ $operator->role }}</td>
-                      <td class="text-end">{{ $operator->created_at->format('d M Y') }}</td>
-                      <td class="text-end">
-                        <a href="{{ route('edit.operator', $operator->id) }}" class="btn btn-warning btn-sm">
-                          Edit
-                        </a>
-                        <form action="{{ route('hapus.operator', $operator->id) }}" method="POST" class="d-inline">
-                          @csrf
-                          @method('DELETE') 
-                          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus operator ini?')"> Hapus </button>
-                        </form>
-                      </td>
-                    </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
+    <div class="mb-3">
+      <label class="form-label">Nama Wakil Dekan</label>
+      <input type="text" name="name" value="{{ old('name',$user->name) }}" class="form-control">
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" value="{{ old('email',$user->email) }}" class="form-control">
+    </div>
+
+    <div class="mb-3"></div>
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin ganti password">
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Update</button>
+</form>
+
           </div>
         </div>
-            {{-- end table operator --}}
-        </div>
-        </div>
+      </div>
     </div>
-    <!-- [ Main Content ] end -->
+
+  </div>
+</div>
+<!-- [ Main Content ] end -->
     <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
         <div class="row">
@@ -402,7 +372,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         </div>
         <div class="col-auto my-1">
           <ul class="list-inline footer-link mb-0">
-            <li class="list-inline-item">Operator</li>
+            <li class="list-inline-item">Mahasiswa</li>
           </ul>
         </div>
       </div>

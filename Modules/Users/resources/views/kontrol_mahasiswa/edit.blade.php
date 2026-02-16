@@ -319,7 +319,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         <div class="row align-items-center">
           <div class="col-md-12">
             <div class="page-header-title">
-              <h5 class="m-b-10">Tambah Mahasiswa</h5>
+              <h5 class="m-b-10">Edit Mahasiswa</h5>
             </div>
           </div>
         </div>
@@ -328,95 +328,46 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
     <!-- Form Section -->
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-2xl-6">
         <div class="card">
           <div class="card-body">
 
-            <form action="{{ route('simpan.mahasiswa') }}" method="POST">
-              @csrf
+            <form action="{{ route('update.mahasiswa',$user->id) }}" method="POST">
+    @csrf
+    @method('PUT')
 
-              {{-- Nama --}}
-              <div class="mb-3">
-                <label class="form-label">Nama Lengkap</label>
-                <input type="text" name="name" 
-                       class="form-control @error('name') is-invalid @enderror"
-                       value="{{ old('name') }}" required>
-                @error('name')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <div class="mb-3">
+      <label class="form-label">Nama Lengkap</label>
+      <input type="text" name="name" value="{{ old('name',$user->name) }}" class="form-control">
+    </div>
 
-              {{-- NIM --}}
-              <div class="mb-3">
-                <label class="form-label">NIM</label>
-                <input type="text" name="nim"
-                       class="form-control @error('nim') is-invalid @enderror"
-                       value="{{ old('nim') }}" required>
-                @error('nim')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <div class="mb-3">
+      <label class="form-label">NIM</label>
+      <input type="text" name="nim" value="{{ old('nim',$mahasiswa->nim) }}" class="form-control">
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" value="{{ old('email',$user->email) }}" class="form-control">
+    </div>
 
-              {{-- Email --}}
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email"
-                       class="form-control @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" required>
-                @error('email')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <div class="mb-3">
+      <label class="form-label">Program Studi</label>
+      <input type="text" name="prodi" value="{{ old('prodi',$mahasiswa->prodi) }}" class="form-control">
+    </div>
 
-              {{-- Prodi --}}
-              <div class="mb-3">
-                <label class="form-label">Program Studi</label>
-                <input type="text" name="prodi"
-                       class="form-control @error('prodi') is-invalid @enderror"
-                       value="{{ old('prodi') }}" required>
-                @error('prodi')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <div class="mb-3">
+      <label class="form-label">Angkatan</label>
+      <input type="number" name="angkatan" value="{{ old('angkatan',$mahasiswa->angkatan) }}" class="form-control">
+    </div>
 
-              {{-- Angkatan --}}
-              <div class="mb-3">
-                <label class="form-label">Angkatan</label>
-                <input type="number" name="angkatan"
-                       class="form-control @error('angkatan') is-invalid @enderror"
-                       value="{{ old('angkatan') }}" required>
-                @error('angkatan')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+    <div class="mb-3"></div>
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-control" placeholder="Kosongkan jika tidak ingin ganti password">
+    </div>
 
-              {{-- Password --}}
-              <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" name="password"
-                       class="form-control @error('password') is-invalid @enderror"
-                       required>
-                @error('password')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-              {{-- Konfirmasi Password --}}
-<div class="mb-3">
-  <label class="form-label">Konfirmasi Password</label>
-  <input type="password" name="password_confirmation"
-         class="form-control" required>
-</div>
-
-              <div class="d-flex justify-content-between">
-                <a href="{{ route('admin.mahasiswa') }}" class="btn btn-secondary">
-                  Kembali
-                </a>
-                <button type="submit" class="btn btn-primary">
-                  Simpan
-                </button>
-              </div>
-
-            </form>
+    <button type="submit" class="btn btn-primary mt-3">Update</button>
+</form>
 
           </div>
         </div>

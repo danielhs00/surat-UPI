@@ -49,4 +49,13 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    public function mahasiswa()
+    {
+        return $this->hasOne(mahasiswa::class, 'user_id');
+    }
+    public function operator()
+    {
+        return $this->hasOne(operator::class, 'user_id');
+    }
 }

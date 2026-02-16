@@ -332,7 +332,15 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           <div class="card">
             <div class="card-body">
               <h6 class="mb-2 f-w-400 text-muted">Total Mahasiswa</h6>
-              <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"></span></h4>
+              <h4 class="mb-3">{{ $jumlah_mahasiswa ?? 0 }}<span class="badge bg-light-primary border border-primary"></span></h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="mb-2 f-w-400 text-muted">Total Operator</h6>
+              <h4 class="mb-3">{{ $jumlah_operator ?? 0 }}<span class="badge bg-light-success border border-success"></span></h4>
             </div>
           </div>
         </div>
@@ -340,14 +348,6 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           <div class="card">
             <div class="card-body">
               <h6 class="mb-2 f-w-400 text-muted">Total Surat</h6>
-              <h4 class="mb-3">78,250 <span class="badge bg-light-success border border-success"></span></h4>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-3">
-          <div class="card">
-            <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Order</h6>
               <h4 class="mb-3">18,800 <span class="badge bg-light-warning border border-warning"></span></h4>
             </div>
           </div>

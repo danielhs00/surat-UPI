@@ -349,31 +349,51 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
             
               <div class="table-responsive">
-                <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>ID Mahasiswa</th>
-                      <th>Nama Mahasiswa</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th class="text-end">Tanggal Dibuat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                     @foreach ($mahasiswas as $index => $mahasiswa)
-                    <tr>
-                      <td>{{ $index + 1 }}</td>
-                      <td>{{ $mahasiswa->id }}</td>
-                      <td>{{ $mahasiswa->name }}</td>
-                      <td>{{ $mahasiswa->email }}</td>
-                      <td>{{ $mahasiswa->role }}</td>
-                      <td class="text-end">{{ $mahasiswa->created_at->format('d M Y') }}</td>
-                    </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
+  <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>NIM</th>
+        <th>Nama Mahasiswa</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th class="text-end">Tanggal Dibuat</th>
+        <th class="text-end">Aksi</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @foreach ($mahasiswas as $index => $mahasiswa)
+        <tr>
+          <td>{{ $index + 1 }}</td>
+          <td>{{ $mahasiswa->mahasiswa->nim ?? 'N/A' }}</td>
+          <td>{{ $mahasiswa->name }}</td>
+          <td>{{ $mahasiswa->email }}</td>
+          <td>{{ $mahasiswa->role }}</td>
+          <td class="text-end">{{ $mahasiswa->created_at->format('d M Y') }}</td>
+
+          <td class="text-end">
+            <a href="{{ route('edit.mahasiswa', $mahasiswa->id) }}" class="btn btn-warning btn-sm">
+              Edit
+            </a>
+
+            <form action="{{ route('hapus.mahasiswa', $mahasiswa->id) }}"
+                  method="POST"
+                  class="d-inline">
+              @csrf
+              @method('DELETE')
+              <button type="submit"
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('Yakin hapus mahasiswa ini?')">
+                Hapus
+              </button>
+            </form>
+          </td>
+        </tr>
+      @endforeach
+    </tbody>
+  </table>
+</div>
             </div>
           </div>
         </div>

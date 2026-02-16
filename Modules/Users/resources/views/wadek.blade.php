@@ -341,7 +341,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
                         </form>
                     </div>
                     <div class="col-auto">
-                        <a href="{{ route('tambah.mahasiswa') }}" class="btn btn-primary">Tambah Mahasiswa</a>
+                        <a href="{{ route('tambah.wadek') }}" class="btn btn-primary">Tambah Wakil Dekan</a>
                     </div>
                 </div>
             </li>
@@ -369,6 +369,16 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
                       <td>{{ $wadek->email }}</td>
                       <td>{{ $wadek->role }}</td>
                       <td class="text-end">{{ $wadek->created_at->format('d M Y') }}</td>
+                      <td class="text-end">
+                        <a href="{{ route('edit.wadek', $wadek->id) }}" class="btn btn-warning btn-sm"> Edit </a>
+                        <form action="{{ route('hapus.wadek', $wadek->id) }}" method="POST" class="d-inline">
+                          @csrf 
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus wadek ini?')">
+                            Hapus
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                     @endforeach
                   </tbody>
@@ -392,7 +402,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         </div>
         <div class="col-auto my-1">
           <ul class="list-inline footer-link mb-0">
-            <li class="list-inline-item">Mahasiswa</li>
+            <li class="list-inline-item">Wakil Dekan</li>
           </ul>
         </div>
       </div>
