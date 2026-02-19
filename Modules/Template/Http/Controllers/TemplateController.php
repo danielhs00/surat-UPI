@@ -2,55 +2,49 @@
 
 namespace Modules\Template\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Storage;
+use Modules\Template\Models\Template;
+
 
 class TemplateController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('template::index');
+        $fakultasId = auth()->user()->fakultas_id;
+
+        $templates = Template::where('fakultas_id', $fakultasId)
+            ->orderByDesc('id')
+            ->get();
+
+        return view('template::operator.templates.index', compact('templates'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('template::create');
+        return view('template::operator.templates.tambah');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
+    public function store(Request $request)
+{
+    $request->validate([
+        'nama_template' => 'required',
+        'jenis_surat' => 'required',
+        'google_docs_url' => 'required|url'
+    ]);
 
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('template::show');
+    Template::create([
+        'fakultas_id' => auth()->user()->fakultas_id,
+        'uploaded_by' => auth()->id(),
+        'nama_template' => $request->nama_template,
+        'jenis_surat' => $request->jenis_surat,
+        'deskripsi' => $request->deskripsi,
+        'google_docs_url' => $request->google_docs_url,
+        'is_active' => true,
+    ]);
+
+    return redirect()->route('operator.template.index')
+        ->with('success', 'Template berhasil ditambahkan');
     }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('template::edit');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
 }

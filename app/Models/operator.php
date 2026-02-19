@@ -17,4 +17,9 @@ class operator extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function fakultas()
+    {
+        return $this->belongsTo(\Modules\Master\Models\Fakultas::class);
+    }
 }

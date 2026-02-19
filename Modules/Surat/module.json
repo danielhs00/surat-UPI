@@ -1,0 +1,11 @@
+{
+    "name": "Surat",
+    "alias": "surat",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Surat\\Providers\\SuratServiceProvider"
+    ],
+    "files": []
+}

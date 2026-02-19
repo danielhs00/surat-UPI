@@ -7,21 +7,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('users', UsersController::class)->names('users');
 });
 
-Route::middleware(['auth','role:admin'])
-    ->prefix('admin')
+Route::middleware(['auth','role:operator'])
+    ->prefix('operator')
+    ->name('operator.')
     ->group(function () {
-        Route::resource('users', UsersController::class);
+
+        Route::get('/templates', [\Modules\Template\Http\Controllers\TemplateController::class, 'index'])
+            ->name('templates.index');
+
+        Route::get('/templates/create', [\Modules\Template\Http\Controllers\TemplateController::class, 'create'])
+            ->name('templates.create');
+
+        Route::post('/templates', [\Modules\Template\Http\Controllers\TemplateController::class, 'store'])
+            ->name('templates.store');
     });
-
-Route::middleware(['auth','role:admin'])
-    ->prefix('admin')
-    ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('users::dashboard');
-        })->name('admin.dashboard');
-    });
-
-
-
-Route::get('/users/operator', [UsersController::class, 'index'])
-    ->name('users.operator');

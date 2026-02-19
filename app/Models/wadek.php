@@ -14,4 +14,9 @@ class wadek extends Model
         'email',
         'password',
     ];
+
+    public function fakultas()
+    {
+        return $this->belongsTo(\Modules\Master\Models\Fakultas::class);
+    }
 }

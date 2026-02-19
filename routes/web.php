@@ -5,6 +5,8 @@ use Modules\Users\Http\Controllers\UsersController;
 use App\Models\mahasiswa;
 use App\Models\operator;
 use App\Models\wadek;
+use Modules\Auth\Http\Controllers\LoginController;
+use Modules\Template\Http\Controllers\TemplateController;
 
 Route::middleware(['auth'])->group(function () {
 
@@ -23,8 +25,8 @@ Route::middleware(['auth'])->group(function () {
     // MULAI HALAMAN ADMIN
     Route::middleware(['role:admin'])->get('/admin/dashboard', function () {
         $jumlah_mahasiswa = Mahasiswa::count();
-    $jumlah_operator  = operator::count();
-    $jumlah_wadek     = Wadek::count();
+        $jumlah_operator  = operator::count();
+        $jumlah_wadek     = Wadek::count();
 
     return view('users::index', compact(
         'jumlah_mahasiswa',
@@ -33,34 +35,15 @@ Route::middleware(['auth'])->group(function () {
     ));
     })->name('admin.dashboard');
 
-    Route::middleware(['role:admin'])->get('/admin/mahasiswa', [UsersController::class, 'mahasiswa'])->name('admin.mahasiswa');
-
+    // ADMIN OPERATOR
      Route::middleware(['role:admin'])->get('/admin/operator', [UsersController::class, 'operator'])->name('admin.operator');
+    // SELESAI ADMIN OPERATOR
 
+    // ADMIN WADEK
      Route::middleware(['role:admin'])->get('/admin/wadek', [UsersController::class, 'wadek'])->name('admin.wadek');
-     
-    // mulai tambah mahasiswa
-    Route::middleware(['role:admin'])->get('/admin/mahasiswa/tambah-mahasiswa', [UsersController::class, 'tambah_mahasiswa'])->name('tambah.mahasiswa');
+    // SELESAI ADMIN WADEK
 
-    Route::post('admin/mahasiswa/simpan', [UsersController::class, 'store'])
-        ->name('simpan.mahasiswa');
-
-    // SELESAI TAMBAH MAHASISWA
-
-    // mulai edit mahasiswa
-    Route::get('admin/mahasiswa/edit/{id}', [UsersController::class, 'editMahasiswa'])
-        ->name('edit.mahasiswa');
-    Route::put('admin/mahasiswa/update/{id}', [UsersController::class, 'updateMahasiswa'])
-        ->name('update.mahasiswa');
-
-    // SELESAI EDIT MAHASISWA
-
-    // mulai hapus mahasiswa
-    Route::delete('admin/mahasiswa/hapus/{id}', [UsersController::class, 'destroyMahasiswa'])
-        ->name('hapus.mahasiswa');
-    // SELESAI HAPUS MAHASISWA
-
-    // mulai tambah operator
+    // MULAI TAMBAH OPERATOR
     Route::get('/admin/operator/tambah-operator', [UsersController::class, 'tambah_operator'])
         ->name('tambah.operator');
     Route::post('/admin/operator/simpan-operator', [UsersController::class, 'storeOperator'])
@@ -98,13 +81,33 @@ Route::middleware(['auth'])->group(function () {
         ->name('hapus.wadek');
     // SELESAI HAPUS WADEK
 
+    //logout
+     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
 
     // SELESAI HALAMAN ADMIN
+    
+    // HALAMAN OPERATOR
+    Route::middleware(['role:operator'])->get('/operator/pengajuan', [UsersController::class, 'pengajuan'])->name('operator.pengajuan');
 
+
+    Route::middleware(['auth', 'role:operator'])
+    ->prefix('operator/template')
+    ->name('operator.template.')
+    ->group(function () {
+
+        Route::get('/', [TemplateController::class, 'index'])->name('index');
+        Route::get('/create', [TemplateController::class, 'create'])->name('create');
+        Route::post('/store', [TemplateController::class, 'store'])->name('store');
+});
 
     Route::middleware(['role:operator'])->get('/operator/dashboard', function () {
         return view('template::index');
     })->name('operator.dashboard');
+
+    Route::middleware(['role:operator'])->get('/operator/Template/Tambah', function () {
+        return view('template::operator.templates.tambah');
+    })->name('template.tambah');
 
     Route::middleware(['role:wadek'])->get('/wadek/dashboard', function () {
         return view('auth::dashboard');
@@ -114,3 +117,5 @@ Route::middleware(['auth'])->group(function () {
         return view('persetujuan::dashboard');
     })->name('mahasiswa.dashboard');
 });
+
+

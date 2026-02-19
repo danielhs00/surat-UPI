@@ -15,10 +15,13 @@ Route::middleware(['auth','role:mahasiswa'])
         Route::get('/templates/{id}/download', [TemplateController::class,'download']);
     });
 
-Route::middleware(['auth','role:operator'])
-    ->prefix('operator')
+
+Route::middleware(['auth', 'role:operator'])
+    ->prefix('operator/template')
+    ->name('operator.template.')
     ->group(function () {
-        Route::get('/dashboard', function () {
-            return view('templates::dashboard');
-        })->name('operator.dashboard');
-    });
+
+        Route::get('/', [TemplateController::class, 'index'])->name('index');
+        Route::get('/create', [TemplateController::class, 'create'])->name('create');
+        Route::post('/store', [TemplateController::class, 'store'])->name('store');
+});

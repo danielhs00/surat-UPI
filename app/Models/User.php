@@ -58,4 +58,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(operator::class, 'user_id');
     }
+
+    public function fakultas()
+    {
+        return $this->belongsTo(\Modules\Master\Models\Fakultas::class);
+    }
 }
