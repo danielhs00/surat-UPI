@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Fakultas;
 use Illuminate\Support\Facades\DB;
+use Modules\Users\Entities\Wadek;
+use App\Models\Operator;
+use Hash;
 
 class UsersController extends Controller
 {
@@ -58,6 +61,47 @@ class UsersController extends Controller
         return view('users::operator.index', compact('operators'));
     }
 
+    public function tambah_operator()
+    {
+        $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
+        return view('users::operator.tambah', compact('fakultas'));
+    }
+
+public function storeOperator(Request $request)
+{
+    $validasi = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+        'fakultas_id' => 'required|exists:fakultas,id',
+    ]);
+
+    // ✅ cek yang benar: berdasarkan tabel operator (karena ada UNIQUE di sana)
+    if (Operator::where('fakultas_id', $validasi['fakultas_id'])->exists()) {
+        return back()
+            ->withInput()
+            ->withErrors(['fakultas_id' => 'Operator untuk fakultas ini sudah ada.']);
+    }
+
+    DB::transaction(function () use ($validasi) {
+
+        $user = User::create([
+            'name' => $validasi['name'],
+            'email' => $validasi['email'],
+            'password' => Hash::make($validasi['password']),
+            'role' => 'operator',
+            'fakultas_id' => $validasi['fakultas_id'],
+        ]);
+
+        Operator::create([
+            'user_id' => $user->id,
+            'fakultas_id' => $validasi['fakultas_id'],
+        ]);
+    });
+
+    return redirect()->route('admin.operator')->with('success', 'Operator berhasil ditambahkan.');
+}
+
     public function wadek()
     {
         $wadeks = User::select('users.*', 'fakultas.nama_fakultas')
@@ -71,8 +115,8 @@ class UsersController extends Controller
 
     public function tambah_wadek()
     {
-        $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
-        return view('users::wadek.tambah', compact('fakultas'));
+         $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
+         return view('users::wadek.tambah', compact('fakultas'));
     }
 
     public function storeWadek(Request $request)
@@ -108,11 +152,55 @@ class UsersController extends Controller
     
     }
 
+    public function updateOperator(Request $request, $id)
+{
+    $validasi = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+        'fakultas_id' => 'required|exists:fakultas,id',
+    ]);
+
+    // Cek unik operator per fakultas (kecuali dirinya sendiri)
+    $sudahAda = User::where('role', 'operator')
+        ->where('fakultas_id', $validasi['fakultas_id'])
+        ->where('id', '!=', $id)
+        ->exists();
+
+    if ($sudahAda) {
+        return back()->withInput()->withErrors(['fakultas_id' => 'Fakultas ini sudah punya operator.']);
+    }
+
+    $user = User::findOrFail($id);
+    $user->update([
+        'name' => $validasi['name'],
+        'email' => $validasi['email'],
+        'fakultas_id' => $validasi['fakultas_id'],
+    ]);
+
+    return redirect()->route('admin.operator')->with('success', 'Operator berhasil diperbarui.');
+    }
+
+    public function editOperator($id)
+    {
+        $user = User::findOrFail($id);
+        $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
+
+        return view('users::operator.edit', compact('user', 'fakultas'));
+    }
+
+    public function destroyOperator($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('admin.operator')->with('success', 'Operator berhasil dihapus.');
+    }
+
     public function editWadek($id)
     {
         $user = User::findOrFail($id);
         $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
-        return view('users::kontrol_wadek.edit', compact('user','fakultas'));
+        
+        return view('users::wadek.edit', compact('user','fakultas'));
     }
 
     public function updateWadek(Request $request, $id)

@@ -9,9 +9,7 @@ class operator extends Model
     protected $table = 'operator';
     protected $fillable = [
         'user_id',
-        'name',
-        'email',
-        'password'
+        'fakultas_id',
     ];
     public function user()
     {

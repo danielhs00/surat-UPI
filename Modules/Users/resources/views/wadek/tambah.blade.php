@@ -327,60 +327,43 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
           <div class="card-body">
 
             <form action="{{ route('simpan.wadek') }}" method="POST">
-              @csrf
+      @csrf
 
-              {{-- Nama --}}
-              <div class="mb-3">
-                <label class="form-label">Nama Wadek</label>
-                <input type="text" name="name" 
-                       class="form-control @error('name') is-invalid @enderror"
-                       value="{{ old('name') }}" required>
-                @error('name')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+      <div class="mb-3">
+        <label>Nama</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
 
-              {{-- Email --}}
-              <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email"
-                       class="form-control @error('email') is-invalid @enderror"
-                       value="{{ old('email') }}" required>
-                @error('email')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
 
-              {{-- Password --}}
-              <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" name="password"
-                       class="form-control @error('password') is-invalid @enderror"
-                       required>
-                @error('password')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-              {{-- Konfirmasi Password --}}
-              <div class="mb-3">
-                <label class="form-label">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" required>
-                @error('password_confirmation')
-                <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+      <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
 
-              {{-- kembali --}}
-              <div class="d-flex justify-content-between">
-                <a href="{{ route('admin.operator') }}" class="btn btn-secondary">
-                  Kembali
-                </a>
-                <button type="submit" class="btn btn-primary">
-                  Simpan
-                </button>
-              </div>
+      <div class="mb-3">
+        <label>Konfirmasi Password</label>
+        <input type="password" name="password_confirmation" class="form-control" required>
+      </div>
 
-            </form>
+      <div class="mb-3">
+        <label>Fakultas</label>
+        <select name="fakultas_id" class="form-control" required>
+          @foreach($fakultas as $f)
+            <option value="{{ $f->id }}">{{ $f->nama_fakultas }}</option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <a href="{{ route('admin.wadek') }}" class="btn btn-secondary">Kembali</a>
+        <button class="btn btn-primary">Simpan</button>
+      </div>
+
+    </form>
 
           </div>
         </div>

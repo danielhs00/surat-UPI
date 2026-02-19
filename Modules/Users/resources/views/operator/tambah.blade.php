@@ -4,7 +4,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Admin | Wakil Dekan</title>
+  <title>Admin | Tambah Operator</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -61,14 +61,14 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
             <span class="pc-mtext">Dashboard</span>
           </a>
         </li>
-        <li class="pc-item">
-          <a href="{{ route('admin.operator') }}" class="pc-link">
+        <li class="pc-item active">
+          <a href="#" class="pc-link">
             <span class="pc-micon"><i class="ti ti-headset"></i></span>
             <span class="pc-mtext">Operator</span>
           </a>
         </li>
-        <li class="pc-item active">
-          <a href="#" class="pc-link">
+        <li class="pc-item">
+          <a href="{{ route('admin.wadek') }}" class="pc-link">
             <span class="pc-micon"><i class="ti ti-user-check"></i></span>
             <span class="pc-mtext">Wakil Dekan</span>
           </a>
@@ -304,88 +304,77 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
 
 
   <!-- [ Main Content ] start -->
-  <div class="pc-container">
-    <div class="pc-content">
-      <!-- [ breadcrumb ] start -->
-      <div class="page-header">
-        <div class="page-block">
-          <div class="row align-items-center">
-            <div class="col-md-12">
-              <div class="page-header-title">
-                <h5 class="m-b-10">Wakil Dekan</h5>
-              </div>
+<div class="pc-container">
+  <div class="pc-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-block">
+        <div class="row align-items-center">
+          <div class="col-md-12">
+            <div class="page-header-title">
+              <h5 class="m-b-10">Tambah Operator</h5>
             </div>
           </div>
         </div>
       </div>
-      <!-- [ breadcrumb ] end -->
-      <!-- [ Main Content ] start -->
-      <div class="row">
+    </div>
 
-        {{-- table wadek --}}
-        <div class="col-md-12 col-2xl-8">
-          <h5 class="mb-3 fs-3">Daftar Wakil Dekan</h5>
-          <div class="card tbl-card">
-            <div class="card-body">
-              <li class="pc-h-item d-none d-md-block">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <form class="header-search me-2">
-                            <input type="search" id="searchInput" class="form-control w-25" placeholder="Cari disini...">
-                        </form>
-                    </div>
-                    <div class="col-auto">
-                        <a href="{{ route('tambah.wadek') }}" class="btn btn-primary">Tambah Wakil Dekan</a>
-                    </div>
-                </div>
-            </li>
+    <!-- Form Section -->
+    <div class="row">
+      <div class="col-lg-12 p-4">
+        <div class="card">
+          <div class="card-body">
 
+            <form action="{{ route('simpan.operator') }}" method="POST">
+          @csrf
 
-            
-              <div class="table-responsive">
-                <table id="pengajuanTable" class="table table-hover table-borderless mb-0">
-                  <thead>
-                    <tr>
-                      <th>No</th>
-                      <th>ID Wakil Dekan</th>
-                      <th>Nama Wakil Dekan</th>
-                      <th>Email</th>
-                      <th>Status</th>
-                      <th class="text-end">Tanggal Dibuat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                     @foreach ($wadeks as $index => $wadek)
-                    <tr>
-                      <td>{{ $index + 1 }}</td>
-                      <td>{{ $wadek->id }}</td>
-                      <td>{{ $wadek->name }}</td>
-                      <td>{{ $wadek->email }}</td>
-                      <td>{{ $wadek->role }}</td>
-                      <td class="text-end">{{ $wadek->created_at->format('d M Y') }}</td>
-                      <td class="text-end">
-                        <a href="{{ route('edit.wadek', $wadek->id) }}" class="btn btn-warning btn-sm"> Edit </a>
-                        <form action="{{ route('hapus.wadek', $wadek->id) }}" method="POST" class="d-inline">
-                          @csrf
-                          @method('DELETE')
-                          <button class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus wadek?')">
-                            Hapus
-                          </button>
-                        </form>
-                      </td>
-                    </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div class="mb-3">
+            <label>Nama</label>
+            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" required>
+            @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+
+          <div class="mb-3">
+            <label>Email</label>
+            <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" required>
+            @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+          </div>
+
+          <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Konfirmasi Password</label>
+            <input type="password" name="password_confirmation" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label>Fakultas</label>
+            <select name="fakultas_id" class="form-control" required>
+  @foreach($fakultas as $f)
+    <option value="{{ $f->id }}">{{ $f->nama_fakultas }}</option>
+  @endforeach
+</select>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <a href="{{ route('admin.operator') }}" class="btn btn-secondary">Kembali</a>
+            <button class="btn btn-primary">Simpan</button>
+          </div>
+
+        </form>
+
           </div>
         </div>
-            {{-- end table wadek --}}
-        </div>
-        </div>
+      </div>
     </div>
-    <!-- [ Main Content ] end -->
+
+  </div>
+</div>
+<!-- [ Main Content ] end -->
     <footer class="pc-footer">
         <div class="footer-wrapper container-fluid">
         <div class="row">
@@ -396,7 +385,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
         </div>
         <div class="col-auto my-1">
           <ul class="list-inline footer-link mb-0">
-            <li class="list-inline-item">Wakil Dekan</li>
+            <li class="list-inline-item">Operator</li>
           </ul>
         </div>
       </div>
