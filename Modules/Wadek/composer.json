@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/wadek",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Wadek\\": "",
+            "Modules\\Wadek\\Database\\Factories\\": "database/factories/",
+            "Modules\\Wadek\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Wadek\\Tests\\": "tests/"
+        }
+    }
+}

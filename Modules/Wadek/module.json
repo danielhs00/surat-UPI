@@ -1,0 +1,11 @@
+{
+    "name": "Wadek",
+    "alias": "wadek",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Wadek\\Providers\\WadekServiceProvider"
+    ],
+    "files": []
+}
