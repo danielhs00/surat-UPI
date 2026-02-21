@@ -126,7 +126,7 @@ return [
         | Setting the generate key to false will not generate that folder
         */
         'generator' => [
-            // 
+            // app/
             'actions' => ['path' => 'Actions', 'generate' => false],
             'casts' => ['path' => 'Casts', 'generate' => false],
             'channels' => ['path' => 'Broadcasting', 'generate' => false],
@@ -154,7 +154,7 @@ return [
             'scopes' => ['path' => 'Models/Scopes', 'generate' => false],
             'traits' => ['path' => 'Traits', 'generate' => false],
 
-            // Http/
+            // app/Http/
             'controller' => ['path' => 'Http/Controllers', 'generate' => true],
             'filter' => ['path' => 'Http/Middleware', 'generate' => false],
             'request' => ['path' => 'Http/Requests', 'generate' => false],

@@ -13,7 +13,7 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles)
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!auth()->check()) {
             return redirect()->route('login');
@@ -21,7 +21,6 @@ class RoleMiddleware
 
         $userRole = auth()->user()->role ?? null;
 
-        // role:mahasiswa atau role:admin,operator
         if (!$userRole || !in_array($userRole, $roles, true)) {
             abort(403, 'Akses ditolak');
         }
