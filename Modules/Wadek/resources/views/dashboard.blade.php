@@ -1,4 +1,5 @@
-@extends('mahasiswa::components.layouts.mantis')
+@extends('layouts.mantis')
+@section('title', 'Dashboard Wadek')
 
 @section('content')
     <div class="container">
@@ -9,7 +10,7 @@
             <thead>
                 <tr>
                     <th>Mahasiswa</th>
-                    <th>Judul</th>s
+                    <th>Judul</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>

@@ -5,6 +5,8 @@ namespace Modules\Wadek\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Mahasiswa\Models\StudentDocument;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Wadek;
 
 class WadekController extends Controller
 {
@@ -64,5 +66,31 @@ class WadekController extends Controller
         ]);
 
         return back()->with('success', 'Surat ditolak.');
+    }
+
+    public function viewPdf($id)
+    {
+        $document = StudentDocument::with(['template'])->findOrFail($id);
+
+        // Wadek login
+        $wdk = wadek::where('user_id', auth()->id())->firstOrFail();
+
+        // Batasi: hanya dokumen fakultas wadek + status sudah dikirim
+        abort_unless($document->status === 'sent_to_wadek', 403, 'Dokumen belum dikirim ke wadek.');
+
+        abort_unless(
+            optional($document->template)->fakultas_id == $wdk->fakultas_id,
+            403,
+            'Akses ditolak.'
+        );
+
+        abort_unless(!empty($document->pdf_path), 404, 'PDF belum tersedia.');
+
+        // Pastikan pakai disk yang benar: local (storage/app)
+        abort_unless(Storage::disk('local')->exists($document->pdf_path), 404, 'File PDF tidak ditemukan.');
+
+        return Storage::disk('local')->response($document->pdf_path);
+        // atau download:
+        // return Storage::disk('local')->download($document->pdf_path);
     }
 }

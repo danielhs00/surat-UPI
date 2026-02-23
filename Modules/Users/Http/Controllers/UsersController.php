@@ -67,40 +67,40 @@ class UsersController extends Controller
         return view('users::operator.tambah', compact('fakultas'));
     }
 
-public function storeOperator(Request $request)
-{
-    $validasi = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email',
-        'password' => 'required|string|min:8|confirmed',
-        'fakultas_id' => 'required|exists:fakultas,id',
-    ]);
+    public function storeOperator(Request $request)
+    {
+        $validasi = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'fakultas_id' => 'required|exists:fakultas,id',
+        ]);
 
-    // ✅ cek yang benar: berdasarkan tabel operator (karena ada UNIQUE di sana)
-    if (Operator::where('fakultas_id', $validasi['fakultas_id'])->exists()) {
-        return back()
-            ->withInput()
-            ->withErrors(['fakultas_id' => 'Operator untuk fakultas ini sudah ada.']);
+        // ✅ cek yang benar: berdasarkan tabel operator (karena ada UNIQUE di sana)
+        if (Operator::where('fakultas_id', $validasi['fakultas_id'])->exists()) {
+            return back()
+                ->withInput()
+                ->withErrors(['fakultas_id' => 'Operator untuk fakultas ini sudah ada.']);
+        }
+
+        DB::transaction(function () use ($validasi) {
+
+            $user = User::create([
+                'name' => $validasi['name'],
+                'email' => $validasi['email'],
+                'password' => Hash::make($validasi['password']),
+                'role' => 'operator',
+                'fakultas_id' => $validasi['fakultas_id'],
+            ]);
+
+            Operator::create([
+                'user_id' => $user->id,
+                'fakultas_id' => $validasi['fakultas_id'],
+            ]);
+        });
+
+        return redirect()->route('admin.operator')->with('success', 'Operator berhasil ditambahkan.');
     }
-
-    DB::transaction(function () use ($validasi) {
-
-        $user = User::create([
-            'name' => $validasi['name'],
-            'email' => $validasi['email'],
-            'password' => Hash::make($validasi['password']),
-            'role' => 'operator',
-            'fakultas_id' => $validasi['fakultas_id'],
-        ]);
-
-        Operator::create([
-            'user_id' => $user->id,
-            'fakultas_id' => $validasi['fakultas_id'],
-        ]);
-    });
-
-    return redirect()->route('admin.operator')->with('success', 'Operator berhasil ditambahkan.');
-}
 
     public function wadek()
     {
@@ -115,69 +115,68 @@ public function storeOperator(Request $request)
 
     public function tambah_wadek()
     {
-         $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
-         return view('users::wadek.tambah', compact('fakultas'));
+        $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
+        return view('users::wadek.tambah', compact('fakultas'));
     }
 
     public function storeWadek(Request $request)
     {
         $validasi = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email',
-        'password' => 'required|string|min:8|confirmed',
-        'fakultas_id' => 'required|exists:fakultas,id',
-    ]);
-
-    $sudahAda = User::where('role', 'wadek')
-        ->where('fakultas_id', $validasi['fakultas_id'])
-        ->exists();
-
-    if ($sudahAda) {
-        return back()
-            ->withInput()
-            ->withErrors(['fakultas_id' => 'Wadek untuk fakultas ini sudah ada.']);
-    }
-
-    DB::transaction(function () use ($validasi) {
-        User::create([
-            'name' => $validasi['name'],
-            'email' => $validasi['email'],
-            'password' => bcrypt($validasi['password']),
-            'role' => 'wadek',
-            'fakultas_id' => $validasi['fakultas_id'],
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'fakultas_id' => 'required|exists:fakultas,id',
         ]);
-    });
 
-    return redirect()->route('admin.wadek')->with('success', 'Wadek berhasil ditambahkan.');
-    
+        $sudahAda = User::where('role', 'wadek')
+            ->where('fakultas_id', $validasi['fakultas_id'])
+            ->exists();
+
+        if ($sudahAda) {
+            return back()
+                ->withInput()
+                ->withErrors(['fakultas_id' => 'Wadek untuk fakultas ini sudah ada.']);
+        }
+
+        DB::transaction(function () use ($validasi) {
+            User::create([
+                'name' => $validasi['name'],
+                'email' => $validasi['email'],
+                'password' => bcrypt($validasi['password']),
+                'role' => 'wadek',
+                'fakultas_id' => $validasi['fakultas_id'],
+            ]);
+        });
+
+        return redirect()->route('admin.wadek')->with('success', 'Wadek berhasil ditambahkan.');
     }
 
     public function updateOperator(Request $request, $id)
-{
-    $validasi = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-        'fakultas_id' => 'required|exists:fakultas,id',
-    ]);
+    {
+        $validasi = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'fakultas_id' => 'required|exists:fakultas,id',
+        ]);
 
-    // Cek unik operator per fakultas (kecuali dirinya sendiri)
-    $sudahAda = User::where('role', 'operator')
-        ->where('fakultas_id', $validasi['fakultas_id'])
-        ->where('id', '!=', $id)
-        ->exists();
+        // Cek unik operator per fakultas (kecuali dirinya sendiri)
+        $sudahAda = User::where('role', 'operator')
+            ->where('fakultas_id', $validasi['fakultas_id'])
+            ->where('id', '!=', $id)
+            ->exists();
 
-    if ($sudahAda) {
-        return back()->withInput()->withErrors(['fakultas_id' => 'Fakultas ini sudah punya operator.']);
-    }
+        if ($sudahAda) {
+            return back()->withInput()->withErrors(['fakultas_id' => 'Fakultas ini sudah punya operator.']);
+        }
 
-    $user = User::findOrFail($id);
-    $user->update([
-        'name' => $validasi['name'],
-        'email' => $validasi['email'],
-        'fakultas_id' => $validasi['fakultas_id'],
-    ]);
+        $user = User::findOrFail($id);
+        $user->update([
+            'name' => $validasi['name'],
+            'email' => $validasi['email'],
+            'fakultas_id' => $validasi['fakultas_id'],
+        ]);
 
-    return redirect()->route('admin.operator')->with('success', 'Operator berhasil diperbarui.');
+        return redirect()->route('admin.operator')->with('success', 'Operator berhasil diperbarui.');
     }
 
     public function editOperator($id)
@@ -199,37 +198,36 @@ public function storeOperator(Request $request)
     {
         $user = User::findOrFail($id);
         $fakultas = DB::table('fakultas')->orderBy('nama_fakultas')->get();
-        
-        return view('users::wadek.edit', compact('user','fakultas'));
+
+        return view('users::wadek.edit', compact('user', 'fakultas'));
     }
 
     public function updateWadek(Request $request, $id)
     {
         $validasi = $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-        'fakultas_id' => 'required|exists:fakultas,id',
-    ]);
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'fakultas_id' => 'required|exists:fakultas,id',
+        ]);
 
-    // unik 1 wadek per fakultas kecuali dirinya
-    $sudahAda = User::where('role', 'wadek')
-        ->where('fakultas_id', $validasi['fakultas_id'])
-        ->where('id', '!=', $id)
-        ->exists();
+        // unik 1 wadek per fakultas kecuali dirinya
+        $sudahAda = User::where('role', 'wadek')
+            ->where('fakultas_id', $validasi['fakultas_id'])
+            ->where('id', '!=', $id)
+            ->exists();
 
-    if ($sudahAda) {
-        return back()->withInput()->withErrors(['fakultas_id' => 'Fakultas ini sudah punya wadek.']);
-    }
+        if ($sudahAda) {
+            return back()->withInput()->withErrors(['fakultas_id' => 'Fakultas ini sudah punya wadek.']);
+        }
 
-    $user = User::findOrFail($id);
-    $user->update([
-        'name' => $validasi['name'],
-        'email' => $validasi['email'],
-        'fakultas_id' => $validasi['fakultas_id'],
-    ]);
+        $user = User::findOrFail($id);
+        $user->update([
+            'name' => $validasi['name'],
+            'email' => $validasi['email'],
+            'fakultas_id' => $validasi['fakultas_id'],
+        ]);
 
-    return redirect()->route('admin.wadek')->with('success', 'Wadek berhasil diperbarui.');
-    
+        return redirect()->route('admin.wadek')->with('success', 'Wadek berhasil diperbarui.');
     }
 
     public function destroyWadek($id)
@@ -248,4 +246,17 @@ public function storeOperator(Request $request)
      * Remove the specified resource from storage.
      */
     public function destroy($id) {}
+    public function pengajuan()
+    {
+        $pengajuans = User::where('role', 'operator')->orderBy('id', 'desc')->get();
+        return view('template::pengajuan-in', compact('pengajuans'));
+    }
+
+    public function editPengajuan($id)
+    {
+        $pengajuan = User::with('mahasiswa')->findOrFail($id);
+        return view('template::edit', compact('pengajuan'));
+    }
+
+
 }
