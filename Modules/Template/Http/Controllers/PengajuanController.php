@@ -150,4 +150,60 @@ class PengajuanController extends Controller
             ]
         );
     }
+
+    public function viewPdfOperator($id)
+    {
+        abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
+
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        abort_unless($op, 403, 'Data operator tidak ditemukan');
+
+        $doc = StudentDocument::with(['template'])->findOrFail($id);
+
+        // operator hanya boleh lihat dokumen fakultasnya
+        $docFakultasId = $doc->template->fakultas_id ?? null;
+        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+
+        // ambil PDF yang sudah dittd dulu, kalau belum ada baru pakai pdf biasa
+        $path = $doc->signed_pdf_path ?: $doc->pdf_path;
+        abort_unless($path, 404, 'PDF belum tersedia');
+        abort_unless(Storage::disk('local')->exists($path), 404, 'File PDF tidak ditemukan');
+
+        return response()->file(
+            Storage::disk('local')->path($path),
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="dokumen-' . $doc->id . '.pdf"',
+            ]
+        );
+    }
+
+    public function downloadDocxOperator($id)
+    {
+        abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
+
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        abort_unless($op, 403, 'Data operator tidak ditemukan');
+
+        $doc = StudentDocument::with(['template'])->findOrFail($id);
+
+        $docFakultasId = $doc->template->fakultas_id ?? null;
+        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+
+        abort_unless($doc->docx_path, 404, 'DOCX belum tersedia');
+        abort_unless(Storage::disk('local')->exists($doc->docx_path), 404, 'File DOCX tidak ditemukan');
+
+        $filename = 'dokumen-' . $doc->id . '.docx';
+        return Storage::disk('local')->download($doc->docx_path, $filename);
+    }
+
+    public function hasilWadek()
+    {
+        $pengajuans = \Modules\Mahasiswa\Models\StudentDocument::with(['user.mahasiswa.fakultas', 'template'])
+            ->whereIn('status', ['signed', 'rejected', 'signed_by_wadek', 'rejected_by_wadek'])
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return view('template::pengajuan-hasil', compact('pengajuans'));
+    }
 }

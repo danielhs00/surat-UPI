@@ -249,7 +249,11 @@
                                         <i class="ti ti-wallet"></i>
                                         <span>Billing</span>
                                     </a>
+<<<<<<< HEAD
                                     <a href="#!" class="dropdown-item">
+=======
+                                    <a href="{{ route('logout') }}" class="dropdown-item">
+>>>>>>> remotes/origin/mirza
                                         <i class="ti ti-power"></i>
                                         <span>Logout</span>
                                     </a>

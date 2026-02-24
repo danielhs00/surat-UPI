@@ -139,11 +139,24 @@
                             </form>
 
                             {{-- Download PDF hanya jika status converted / approved_wadek --}}
-                            @if (!empty($d->pdf_path) && in_array($d->status, ['converted', 'approved_wadek'], true))
+                            @if (!empty($d->pdf_path) && in_array($d->status, ['converted', 'approved_wadek', 'signed', 'signed_by_wadek'], true))
                                 <a class="btn btn-sm btn-success w-100 mt-2"
                                     href="{{ route('mahasiswa.documents.downloadPdf', $d->id) }}">
                                     Download PDF
                                 </a>
+                            @endif
+
+                            @php
+                                $pdfFinal = $d->signed_pdf_path ?: $d->pdf_path;
+                            @endphp
+
+                            @if (!empty($pdfFinal))
+                                <a class="btn btn-sm {{ $d->signed_pdf_path ? 'btn-success' : 'btn-primary' }} w-100 mt-2"
+                                    href="{{ route('mahasiswa.dokumen.pdf', $d->id) }}" target="_blank" rel="noopener">
+                                    {{ $d->signed_pdf_path ? 'Lihat PDF TTD' : 'Lihat PDF' }}
+                                </a>
+                            @else
+                                <span class="text-muted">Belum ada PDF</span>
                             @endif
                         </div>
 

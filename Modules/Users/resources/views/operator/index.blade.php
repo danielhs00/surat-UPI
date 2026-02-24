@@ -265,7 +265,7 @@ href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-
               <i class="ti ti-wallet"></i>
               <span>Billing</span>
             </a>
-            <a href="#!" class="dropdown-item">
+            <a href="{{ route('logout') }}" class="dropdown-item">
               <i class="ti ti-power"></i>
               <span>Logout</span>
             </a>

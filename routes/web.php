@@ -11,6 +11,7 @@ use Modules\Template\Http\Controllers\TemplateController;
 use Modules\Mahasiswa\Http\Controllers\MahasiswaDashboardController;
 use Modules\Template\Http\Controllers\PengajuanController;
 use Modules\Wadek\Http\Controllers\WadekDashboardController;
+use Modules\Wadek\Http\Controllers\WadekController;
 
 
 use App\Models\mahasiswa;
@@ -26,7 +27,7 @@ use App\Models\wadek;
 // Landing kalau belum login
 Route::get('/', function () {
     if (!auth()->check()) {
-        return view('welcome');
+        return view('auth::login');
     }
 
     $role = auth()->user()->role;
@@ -35,7 +36,8 @@ Route::get('/', function () {
         'admin' => redirect()->route('admin.dashboard'),
         'operator' => redirect()->route('operator.dashboard'),
         'wadek' => redirect()->route('wadek.dashboard'),
-        default => redirect()->route('mahasiswa.dashboard'),
+        'mahasiswa' => redirect()->route('mahasiswa.dashboard'),
+        default => abort(403, 'Akses ditolak'),
     };
 })->name('dashboard');
 
@@ -129,11 +131,21 @@ Route::middleware(['auth'])->group(function () {
         ->prefix('operator')
         ->group(function () {
             Route::get('/pengajuan', [PengajuanController::class, 'pengajuan'])->name('operator.pengajuan');
+
             Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('operator.pengajuan.edit');
+
             Route::put('/pengajuan/{id}', [PengajuanController::class, 'update'])->name('operator.pengajuan.update');
+
             Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->name('operator.pengajuan.destroy');
+
             Route::put('/pengajuan/{id}/kirim-wadek', [PengajuanController::class, 'kirimKeWadek'])->name('operator.pengajuan.kirim_wadek');
-            Route::get('/pengajuan/{id}/pdf', [\Modules\Template\Http\Controllers\PengajuanController::class, 'viewPdf'])->name('operator.pengajuan.pdf');
+
+            Route::get('/operator/pengajuan/{id}/pdf', [PengajuanController::class, 'viewPdfOperator'])->name('operator.pengajuan.pdf');
+
+            Route::get('/pengajuan/hasil', [\Modules\Template\Http\Controllers\PengajuanController::class, 'hasilWadek'])->name('operator.pengajuan.hasil');
+
+            Route::get('/pengajuan/{id}/docx', [PengajuanController::class, 'downloadDocxOperator'])
+                ->name('operator.pengajuan.docx');
         });
 
     Route::middleware(['role:operator'])
@@ -164,9 +176,22 @@ Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['auth', 'role:wadek'])
         ->prefix('wadek')
+        ->name('wadek.')
         ->group(function () {
-            Route::get('/dashboard', [WadekDashboardController::class, 'index'])->name('wadek.dashboard');
-            Route::get('/documents/{id}/pdf', [\Modules\Wadek\Http\Controllers\WadekController::class, 'viewPdf'])->name('wadek.documents.pdf');
+
+            Route::get('/dashboard', [WadekDashboardController::class, 'index'])->name('dashboard');
+
+            Route::get('/documents/{id}', [WadekController::class, 'show'])->name('documents.show');
+
+            Route::get('/documents/{id}/pdf', [WadekController::class, 'viewPdf'])->name('documents.pdf');
+
+            Route::put('/documents/{id}/sign', [WadekController::class, 'sign'])->name('documents.sign');
+
+            Route::put('/documents/{id}/reject', [WadekController::class, 'reject'])->name('documents.reject');
+
+            Route::post('/signature', [WadekController::class, 'uploadSignature'])->name('signature.upload');
+
+            Route::get('/documents/{id}/docx', [WadekController::class, 'downloadDocx'])->name('documents.docx');
         });
 
     /*
@@ -174,7 +199,14 @@ Route::middleware(['auth'])->group(function () {
     | Mahasiswa
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['auth', 'role:mahasiswa'])
-        ->get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])
-        ->name('mahasiswa.dashboard');
+
+    Route::middleware(['auth','role:mahasiswa'])
+        ->prefix('mahasiswa')
+        ->name('mahasiswa.')
+        ->group(function () {
+
+            Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])->name('mahasiswa.dashboard');
+
+            Route::get('/dokumen/{id}/pdf', [\Modules\Mahasiswa\Http\Controllers\StudentDocumentController::class, 'viewPdf'])->name('dokumen.pdf');
+      });
 });

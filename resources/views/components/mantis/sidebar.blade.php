@@ -3,10 +3,10 @@
 
     $dashboardRoute = match ($role) {
         'mahasiswa' => route('mahasiswa.dashboard'),
-        'operator'  => route('operator.dashboard'),
-        'wadek'     => route('wadek.dashboard'),
-        'admin'     => route('admin.dashboard'),
-        default     => route('dashboard'),
+        'operator' => route('operator.dashboard'),
+        'wadek' => route('wadek.dashboard'),
+        'admin' => route('admin.dashboard'),
+        default => route('dashboard'),
     };
 
     $isActive = function (string $name) {
@@ -61,6 +61,7 @@
                             <span class="pc-mtext">Verifikasi Dokumen</span>
                         </a>
                     </li>
+
                 @endif
 
                 {{-- Wadek --}}

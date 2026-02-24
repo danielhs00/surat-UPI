@@ -5,7 +5,7 @@ namespace Modules\Wadek\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Modules\Mahasiswa\Models\StudentDocument;
-use App\Models\wadek;
+use App\Models\wadek As Wadek;
 
 class WadekDashboardController extends Controller
 {

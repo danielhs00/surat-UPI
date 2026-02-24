@@ -111,4 +111,22 @@ class StudentDocumentController extends Controller
         return redirect()->route('mahasiswa.dashboard')
             ->with('success', 'Draft berhasil dibuat. Silakan upload DOCX untuk diproses.');
     }
+
+    public function viewPdf($id)
+    {
+        $doc = StudentDocument::findOrFail($id);
+
+        // hanya pemilik dokumen (mahasiswa) yang boleh lihat
+        abort_unless($doc->user_id === auth()->id(), 403);
+
+        // prioritas PDF berttd
+        $path = $doc->signed_pdf_path ?: $doc->pdf_path;
+        abort_unless($path, 404, 'PDF belum tersedia');
+        abort_unless(Storage::disk('local')->exists($path), 404, 'File PDF tidak ditemukan');
+
+        return response()->file(Storage::disk('local')->path($path), [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="dokumen-' . $doc->id . '.pdf"',
+        ]);
+    }
 }

@@ -4,93 +4,225 @@ namespace Modules\Wadek\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Mahasiswa\Models\StudentDocument;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Wadek;
+use Modules\Mahasiswa\Models\StudentDocument;
+use Modules\Wadek\Models\Wadek;
 
 class WadekController extends Controller
 {
-    public function index()
+    private function currentWadek(): Wadek
     {
-        $documents = StudentDocument::where('status', 'verified_operator')
-            ->orderByDesc('updated_at')
-            ->get();
-
-        return view('wadek::dashboard', compact('documents'));
+        return Wadek::where('user_id', auth()->id())->firstOrFail();
     }
 
-    public function show(StudentDocument $document)
+    private function authorizeDocumentForWadek(StudentDocument $doc, Wadek $wdk): void
     {
-        return view('wadek::show', compact('document'));
+        // dokumen harus berasal dari fakultas wadek (lewat template)
+        $templateFakultasId = optional($doc->template)->fakultas_id;
+
+        if (!$templateFakultasId || $templateFakultasId != $wdk->fakultas_id) {
+            abort(403, 'Dokumen bukan untuk fakultas Anda.');
+        }
     }
 
-    private function generateNomorSurat(): string
+    public function show($id)
     {
-        $bulanRomawi = [
-            1 => 'I',
-            2 => 'II',
-            3 => 'III',
-            4 => 'IV',
-            5 => 'V',
-            6 => 'VI',
-            7 => 'VII',
-            8 => 'VIII',
-            9 => 'IX',
-            10 => 'X',
-            11 => 'XI',
-            12 => 'XII',
-        ];
+        $wdk = $this->currentWadek();
 
-        $bulan = $bulanRomawi[now()->month];
-        $tahun = now()->year;
+        $document = StudentDocument::with(['user.mahasiswa.fakultas', 'template'])
+            ->findOrFail($id);
 
-        // hitung jumlah surat yang sudah approved tahun ini
-        $count = StudentDocument::whereYear('approved_at', $tahun)->count() + 1;
+        $this->authorizeDocumentForWadek($document, $wdk);
 
-        $urutan = str_pad($count, 3, '0', STR_PAD_LEFT);
-
-        return "{$urutan}/UPI/{$bulan}/{$tahun}";
+        return view('wadek::show', compact('document', 'wdk'));
     }
 
-    public function reject(Request $request, StudentDocument $document)
+    public function uploadSignature(Request $request)
     {
-        $request->validate([
-            'catatan' => 'required|string'
+        $wdk = $this->currentWadek();
+
+        $data = $request->validate([
+            'ttd' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:2048'],
         ]);
 
-        $document->update([
-            'status' => 'approved_wadek',
-            'nomor_surat' => $nomor,
-            'approved_at' => now(),
-            'approved_by' => auth()->id(),
+        $path = $data['ttd']->store('wadek/ttd', 'local'); // storage/app/wadek/ttd/...
+
+        $wdk->update([
+            'ttd_path' => $path,
+            'ttd_uploaded_at' => now(),
         ]);
 
-        return back()->with('success', 'Surat ditolak.');
+        return back()->with('success', 'TTD berhasil diupload.');
     }
 
     public function viewPdf($id)
     {
+        $wdk = $this->currentWadek();
+
+        $document = StudentDocument::with(['template'])
+            ->findOrFail($id);
+
+        $this->authorizeDocumentForWadek($document, $wdk);
+
+        // pilih pdf signed kalau ada, kalau belum pakai pdf_path biasa
+        $relPath = $document->signed_pdf_path ?: $document->pdf_path;
+
+        if (!$relPath || !Storage::disk('local')->exists($relPath)) {
+            abort(404, 'PDF tidak ditemukan.');
+        }
+
+        $abs = Storage::disk('local')->path($relPath);
+        return response()->file($abs, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    public function sign(Request $request, $id)
+    {
+        $wdk = $this->currentWadek();
+
+        $document = StudentDocument::with(['template', 'user.mahasiswa'])
+            ->findOrFail($id);
+
+        $this->authorizeDocumentForWadek($document, $wdk);
+
+        // Pastikan status memang sudah dikirim operator ke wadek
+        if ($document->status !== 'sent_to_wadek') {
+            return back()->with('error', 'Status dokumen belum "sent_to_wadek".');
+        }
+
+        $data = $request->validate([
+            'nomor_surat' => ['required', 'string', 'max:100'],
+            'catatan_wadek' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        // --- update data utama ---
+        $document->nomor_surat = $data['nomor_surat'];
+        $document->catatan_wadek = $data['catatan_wadek'] ?? null;
+        $document->signed_by = auth()->id();
+        $document->signed_at = now();
+
+        // --- Jika mau tempel TTD ke PDF (FPDI) ---
+        // Kalau belum upload TTD atau belum install fpdi, kita tetap approve tanpa tempel ttd
+        $signedRel = null;
+
+        if ($wdk->ttd_path && Storage::disk('local')->exists($wdk->ttd_path) && $document->pdf_path && Storage::disk('local')->exists($document->pdf_path)) {
+            try {
+                // butuh: composer require setasign/fpdi-fpdf
+                $srcPdf = Storage::disk('local')->path($document->pdf_path);
+                $sigImg = Storage::disk('local')->path($wdk->ttd_path);
+
+                $signedRel = "wadek/signed/{$document->id}.pdf";
+                $signedAbs = Storage::disk('local')->path($signedRel);
+
+                if (!is_dir(dirname($signedAbs))) {
+                    mkdir(dirname($signedAbs), 0775, true);
+                }
+
+                $pdf = new \setasign\Fpdi\Fpdi();
+                $pageCount = $pdf->setSourceFile($srcPdf);
+
+                for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                    $tplId = $pdf->importPage($pageNo);
+                    $size = $pdf->getTemplateSize($tplId);
+
+                    $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                    $pdf->useTemplate($tplId);
+
+                    // tempel hanya di halaman terakhir
+                    if ($pageNo === $pageCount) {
+                        // posisi kira-kira kanan bawah (sesuaikan nanti)
+                        $x = $size['width'] - 70;   // 70mm dari kanan
+                        $y = $size['height'] - 60;  // 60mm dari bawah
+                        $w = 55;                    // lebar ttd
+
+                        $pdf->Image($sigImg, $x, $y, $w);
+
+                        // teks nomor surat
+                        $pdf->SetFont('Arial', '', 10);
+                        $pdf->SetXY(15, $size['height'] - 25);
+                        $pdf->Cell(0, 6, 'Nomor Surat: ' . $data['nomor_surat']);
+                    }
+                }
+
+                $pdf->Output($signedAbs, 'F');
+                $document->signed_pdf_path = $signedRel;
+                $document->pdf_path = $signedRel;
+            } catch (\Throwable $e) {
+                // gagal tempel, tetap lanjut approve (biar user ga stuck)
+                // simpan error ke convert_error kalau mau
+            }
+        }
+
+        $document->signed_by = auth()->id();
+        $document->signed_at = now();
+        $document->status = 'signed';
+        $document->save();
+
+        return redirect()
+            ->route('wadek.documents.show', $document->id)
+            ->with('success', 'Berhasil input nomor surat & tanda tangan.');
+    }
+
+    public function reject(Request $request, $id)
+    {
+        $wdk = $this->currentWadek();
+
+        $document = StudentDocument::with(['template'])
+            ->findOrFail($id);
+
+        $this->authorizeDocumentForWadek($document, $wdk);
+
+        $data = $request->validate([
+            'catatan_wadek' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $document->status = 'rejected';
+        $document->catatan_wadek = $data['catatan_wadek'];
+        $document->signed_by = auth()->id();
+        $document->signed_at = now();
+        $document->save();
+
+        return redirect()
+            ->route('wadek.documents.show', $document->id)
+            ->with('success', 'Dokumen ditolak dan dikembalikan ke operator.');
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $request->validate([
+            'nomor_surat' => 'required|string|max:100',
+            'catatan_wadek' => 'nullable|string',
+        ]);
+
+        $doc = \Modules\Mahasiswa\Models\StudentDocument::findOrFail($id);
+
+        // TODO: generate signed pdf -> simpan ke signed_pdf_path
+        // $signedPath = ...
+
+        $doc->update([
+            'nomor_surat' => $request->nomor_surat,
+            'catatan_wadek' => $request->catatan_wadek,
+            'signed_by' => auth()->id(),
+            'signed_at' => now(),
+            'signed_pdf_path' => $signedPath ?? $doc->signed_pdf_path, // kalau sudah kamu isi
+            'status' => 'signed',
+        ]);
+
+        return back()->with('success', 'Dokumen berhasil ditandatangani.');
+    }
+
+    public function downloadDocx($id)
+    {
+        $wdk = $this->currentWadek();
+
         $document = StudentDocument::with(['template'])->findOrFail($id);
+        $this->authorizeDocumentForWadek($document, $wdk);
 
-        // Wadek login
-        $wdk = wadek::where('user_id', auth()->id())->firstOrFail();
+        if (!$document->docx_path || !Storage::disk('local')->exists($document->docx_path)) {
+            abort(404, 'DOCX tidak ditemukan.');
+        }
 
-        // Batasi: hanya dokumen fakultas wadek + status sudah dikirim
-        abort_unless($document->status === 'sent_to_wadek', 403, 'Dokumen belum dikirim ke wadek.');
-
-        abort_unless(
-            optional($document->template)->fakultas_id == $wdk->fakultas_id,
-            403,
-            'Akses ditolak.'
-        );
-
-        abort_unless(!empty($document->pdf_path), 404, 'PDF belum tersedia.');
-
-        // Pastikan pakai disk yang benar: local (storage/app)
-        abort_unless(Storage::disk('local')->exists($document->pdf_path), 404, 'File PDF tidak ditemukan.');
-
-        return Storage::disk('local')->response($document->pdf_path);
-        // atau download:
-        // return Storage::disk('local')->download($document->pdf_path);
+        return Storage::disk('local')->download($document->docx_path, 'dokumen-' . $document->id . '.docx');
     }
 }
