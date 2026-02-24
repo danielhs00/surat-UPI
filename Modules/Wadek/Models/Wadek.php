@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class operator extends Model
+class wadek extends Model
 {
-    protected $table = 'operator';
+    protected $table = 'wadek';
+
     protected $fillable = [
         'user_id',
         'fakultas_id',
     ];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

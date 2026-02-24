@@ -8,6 +8,10 @@ use App\Http\Controllers\Auth\SsoController;
 use Modules\Users\Http\Controllers\UsersController;
 use Modules\Auth\Http\Controllers\LoginController;
 use Modules\Template\Http\Controllers\TemplateController;
+use Modules\Mahasiswa\Http\Controllers\MahasiswaDashboardController;
+use Modules\Template\Http\Controllers\PengajuanController;
+use Modules\Wadek\Http\Controllers\WadekDashboardController;
+
 
 use App\Models\mahasiswa;
 use App\Models\operator;
@@ -121,7 +125,16 @@ Route::middleware(['auth'])->group(function () {
     | Operator
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:operator'])->get('/operator/pengajuan', [UsersController::class, 'pengajuan'])->name('operator.pengajuan');
+    Route::middleware(['auth', 'role:operator'])
+        ->prefix('operator')
+        ->group(function () {
+            Route::get('/pengajuan', [PengajuanController::class, 'pengajuan'])->name('operator.pengajuan');
+            Route::get('/pengajuan/{id}/edit', [PengajuanController::class, 'edit'])->name('operator.pengajuan.edit');
+            Route::put('/pengajuan/{id}', [PengajuanController::class, 'update'])->name('operator.pengajuan.update');
+            Route::delete('/pengajuan/{id}', [PengajuanController::class, 'destroy'])->name('operator.pengajuan.destroy');
+            Route::put('/pengajuan/{id}/kirim-wadek', [PengajuanController::class, 'kirimKeWadek'])->name('operator.pengajuan.kirim_wadek');
+            Route::get('/pengajuan/{id}/pdf', [\Modules\Template\Http\Controllers\PengajuanController::class, 'viewPdf'])->name('operator.pengajuan.pdf');
+        });
 
     Route::middleware(['role:operator'])
         ->prefix('operator/template')
@@ -145,16 +158,23 @@ Route::middleware(['auth'])->group(function () {
     | Wadek
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:wadek'])->get('/wadek/dashboard', function () {
-        return view('auth::dashboard');
-    })->name('wadek.dashboard');
+    // Route::middleware(['role:wadek'])->get('/wadek/dashboard', function () {
+    //     return view('wadek::dashboard'); // atau auth::dashboard
+    // });
+
+    Route::middleware(['auth', 'role:wadek'])
+        ->prefix('wadek')
+        ->group(function () {
+            Route::get('/dashboard', [WadekDashboardController::class, 'index'])->name('wadek.dashboard');
+            Route::get('/documents/{id}/pdf', [\Modules\Wadek\Http\Controllers\WadekController::class, 'viewPdf'])->name('wadek.documents.pdf');
+        });
 
     /*
     |--------------------------------------------------------------------------
     | Mahasiswa
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:mahasiswa'])->get('/mahasiswa/dashboard', function () {
-        return view('persetujuan::dashboard');
-    })->name('mahasiswa.dashboard');
+    Route::middleware(['auth', 'role:mahasiswa'])
+        ->get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])
+        ->name('mahasiswa.dashboard');
 });

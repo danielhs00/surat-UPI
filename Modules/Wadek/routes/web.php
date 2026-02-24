@@ -19,4 +19,7 @@ Route::middleware(['auth','role:wadek'])
 
         Route::post('/documents/{document}/reject', [WadekController::class,'reject'])
             ->name('documents.reject');
+            
+        Route::get('/documents/{id}/pdf', [WadekController::class, 'viewPdf'])
+            ->name('wadek.documents.pdf');
     });
