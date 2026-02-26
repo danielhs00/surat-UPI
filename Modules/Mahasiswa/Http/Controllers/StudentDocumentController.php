@@ -11,6 +11,7 @@ use Modules\Mahasiswa\Models\StudentDocument;
 use Modules\Mahasiswa\Models\DocumentVersion;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class StudentDocumentController extends Controller
 {
@@ -129,4 +130,18 @@ class StudentDocumentController extends Controller
             'Content-Disposition' => 'inline; filename="dokumen-' . $doc->id . '.pdf"',
         ]);
     }
+
+    //RESET STATUS DOKUMEN
+    public function dashboard(Request $request)
+{
+    $status = $request->query('status', 'all');
+
+    dd([
+        'full_url' => $request->fullUrl(),
+        'status_query' => $request->query('status'),
+        'status_var' => $status,
+    ]);
+
+    // kode bawah ini tidak akan jalan karena dd() menghentikan program
+}
 }

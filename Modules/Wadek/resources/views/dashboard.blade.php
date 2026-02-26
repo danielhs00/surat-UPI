@@ -1,5 +1,6 @@
 @extends('layouts.mantis')
 @section('title', 'Dashboard Wadek')
+@include('components.mantis.header', ['role' => 'wadek'])
 
 @section('content')
     <div class="container">

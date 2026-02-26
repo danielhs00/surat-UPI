@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Mahasiswa\Http\Controllers\MahasiswaDashboardController;
 use Modules\Mahasiswa\Http\Controllers\StudentDocumentController;
 
-Route::middleware(['auth', 'role:mahasiswa'])
+Route::middleware(['auth', 'role:mahasiswa','nocache'])
     ->prefix('mahasiswa')
     ->name('mahasiswa.')
     ->group(function () {
@@ -23,4 +23,5 @@ Route::middleware(['auth', 'role:mahasiswa'])
 
         Route::get('/documents/{document}/download-pdf', [StudentDocumentController::class, 'downloadPdf'])
             ->name('documents.downloadPdf');
+        Route::put('/documents/clear-dashboard', [MahasiswaDashboardController::class, 'clearDashboard'])->name('documents.clearDashboard');
     });

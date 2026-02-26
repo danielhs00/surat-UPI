@@ -16,5 +16,5 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/css/style.css" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/css/style-preset.css">
-    @vite('resources/js/app.css')
+    
 </div>

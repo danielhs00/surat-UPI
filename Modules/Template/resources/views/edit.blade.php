@@ -108,29 +108,29 @@
                             @csrf
                             @method('PUT')
 
-                            <div class="row g-3">
+                            <div class="row g-1 py-4 ">
                                 <div class="col-md-6">
                                     <label class="form-label">Ubah Status</label>
                                     <select name="status" class="form-control @error('status') is-invalid @enderror"
                                         required>
                                         @php $current = old('status', $pengajuan->status); @endphp
                                         <option value="draft" {{ $current == 'draft' ? 'selected' : '' }}>draft</option>
-                                        <option value="uploaded" {{ $current == 'uploaded' ? 'selected' : '' }}>uploaded
+                                        <option value="mengupload" {{ $current == 'mengupload' ? 'selected' : '' }}>Mengupload
                                         </option>
                                         <option value="converting" {{ $current == 'converting' ? 'selected' : '' }}>
                                             converting
                                         </option>
                                         <option value="converted" {{ $current == 'converted' ? 'selected' : '' }}>converted
                                         </option>
-                                        <option value="failed" {{ $current == 'failed' ? 'selected' : '' }}>failed</option>
+                                        <option value="gagal" {{ $current == 'gagal' ? 'selected' : '' }}>Gagal</option>
                                         {{-- kalau kamu pakai status ini, tambahkan di controller validate() juga --}}
-                                        <option value="sent_to_wadek" {{ $current == 'sent_to_wadek' ? 'selected' : '' }}>
-                                            sent_to_wadek</option>
+                                        <option value="kirim ke wadek" {{ $current == 'kirim ke wadek' ? 'selected' : '' }}>
+                                            Kirim ke wadek</option>
                                     </select>
                                     @error('status')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <small class="text-muted">Gunakan <b>failed</b> kalau ada error convert.</small>
+                                    <small class="text-muted">Pilih <b>gagal</b> kalau ada error convert.</small>
                                 </div>
 
                                 <div class="col-md-6">
@@ -161,11 +161,47 @@
                                     method="POST">
                                     @csrf
                                     @method('PUT')
-                                    <button type="submit" class="btn btn-success"
-                                        onclick="return confirm('Yakin kirim pengajuan ini ke Wadek?')">
-                                        Kirim ke Wadek
-                                    </button>
+                                    <button type="button" class="btn btn-success"
+                                    data-bs-toggle="modal" data-bs-target="#kirimWadekModal{{ $pengajuan->id }}">
+                                    Kirim ke Wadek
+                                </button>
                                 </form>
+                                <!-- Modal -->
+<div class="modal fade" id="kirimWadekModal{{ $pengajuan->id }}" tabindex="-1" 
+    aria-labelledby="kirimWadekLabel{{ $pengajuan->id }}" aria-hidden="true">
+    
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="kirimWadekLabel{{ $pengajuan->id }}">
+                    Konfirmasi Pengiriman
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <div class="modal-body">
+                Apakah Anda yakin ingin mengirim pengajuan ini ke Wadek?
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Batal
+                </button>
+
+                <form action="{{ route('operator.pengajuan.kirim_wadek', $pengajuan->id) }}"
+                    method="POST">
+                    @csrf
+                    @method('PUT')
+                    <button type="submit" class="btn btn-success">
+                        Ya, Kirim
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
                             @else
                                 <button class="btn btn-success" disabled>Sudah dikirim ke Wadek</button>
                             @endif
@@ -177,3 +213,5 @@
             </div>
         </div>
     @endsection
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

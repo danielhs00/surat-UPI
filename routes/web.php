@@ -8,7 +8,6 @@ use App\Http\Controllers\Auth\SsoController;
 use Modules\Users\Http\Controllers\UsersController;
 use Modules\Auth\Http\Controllers\LoginController;
 use Modules\Template\Http\Controllers\TemplateController;
-use Modules\Mahasiswa\Http\Controllers\MahasiswaDashboardController;
 use Modules\Template\Http\Controllers\PengajuanController;
 use Modules\Wadek\Http\Controllers\WadekDashboardController;
 use Modules\Wadek\Http\Controllers\WadekController;
@@ -24,22 +23,28 @@ use App\Models\wadek;
 |--------------------------------------------------------------------------
 */
 
-// Landing kalau belum login
-Route::get('/', function () {
-    if (!auth()->check()) {
-        return view('auth::login');
-    }
+// Dashboard admin (punyamu)
+Route::middleware(['auth', 'role:admin', 'nocache'])
+    ->get('/admin/dashboard', function () {
+        $jumlah_mahasiswa = mahasiswa::count();
+        $jumlah_operator  = operator::count();
+        $jumlah_wadek     = wadek::count();
 
-    $role = auth()->user()->role;
+        return view('users::index', compact(
+            'jumlah_mahasiswa',
+            'jumlah_operator',
+            'jumlah_wadek'
+        ));
+    })->name('admin.dashboard');
 
-    return match ($role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'operator' => redirect()->route('operator.dashboard'),
-        'wadek' => redirect()->route('wadek.dashboard'),
-        'mahasiswa' => redirect()->route('mahasiswa.dashboard'),
-        default => abort(403, 'Akses ditolak'),
-    };
-})->name('dashboard');
+// Pengajuan admin
+Route::middleware(['auth', 'role:admin', 'nocache'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/pengajuan', [PengajuanController::class, 'pengajuan'])
+            ->name('pengajuan');
+    });
 
 // SSO routes (public)
 Route::get('/sso/login', [SsoController::class, 'redirect'])->name('sso.login');
@@ -61,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
     | Admin
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['role:admin'])->get('/admin/dashboard', function () {
+    Route::middleware(['auth', 'role:admin', 'nocache'])->get('/admin/dashboard', function () {
         $jumlah_mahasiswa = mahasiswa::count();
         $jumlah_operator  = operator::count();
         $jumlah_wadek     = wadek::count();
@@ -72,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
             'jumlah_wadek'
         ));
     })->name('admin.dashboard');
+    
 
     // Admin - Operator
     Route::middleware(['role:admin'])->get('/admin/operator', [UsersController::class, 'operator'])->name('admin.operator');
@@ -97,7 +103,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('hapus.operator');
 
     // Admin - Wadek
-    Route::middleware(['role:admin'])->get('/admin/wadek', [UsersController::class, 'wadek'])->name('admin.wadek');
+    Route::middleware(['role:admin','nocache'])->get('/admin/wadek', [UsersController::class, 'wadek'])->name('admin.wadek');
 
     Route::get('/admin/wadek/tambah-wadek', [UsersController::class, 'tambah_wadek'])
         ->middleware(['role:admin'])
@@ -120,14 +126,14 @@ Route::middleware(['auth'])->group(function () {
         ->name('hapus.wadek');
 
     // Logout (punya module Auth)
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'destroy'])->name('logout');
 
     /*
     |--------------------------------------------------------------------------
     | Operator
     |--------------------------------------------------------------------------
     */
-    Route::middleware(['auth', 'role:operator'])
+    Route::middleware(['auth', 'role:operator', 'nocache'])
         ->prefix('operator')
         ->group(function () {
             Route::get('/pengajuan', [PengajuanController::class, 'pengajuan'])->name('operator.pengajuan');
@@ -157,11 +163,17 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/store', [TemplateController::class, 'store'])->name('store');
         });
 
-    Route::middleware(['role:operator'])->get('/operator/dashboard', function () {
-        return view('template::index');
-    })->name('operator.dashboard');
+Route::middleware(['auth', 'role:operator', 'nocache'])
+    ->prefix('operator')
+    ->name('operator.')
+    ->group(function () {
 
-    Route::middleware(['role:operator'])->get('/operator/Template/Tambah', function () {
+        Route::get('/', [TemplateController::class, 'index'])
+            ->name('dashboard');
+
+    });
+
+    Route::middleware(['auth', 'role:operator'])->get('/operator/Template/Tambah', function () {
         return view('template::operator.templates.tambah');
     })->name('template.tambah');
 
@@ -174,7 +186,7 @@ Route::middleware(['auth'])->group(function () {
     //     return view('wadek::dashboard'); // atau auth::dashboard
     // });
 
-    Route::middleware(['auth', 'role:wadek'])
+    Route::middleware(['auth', 'role:wadek', 'nocache'])
         ->prefix('wadek')
         ->name('wadek.')
         ->group(function () {
@@ -193,20 +205,10 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/documents/{id}/docx', [WadekController::class, 'downloadDocx'])->name('documents.docx');
         });
-
     /*
     |--------------------------------------------------------------------------
-    | Mahasiswa
+    | router mahasiswa ada di module mahaswa
     |--------------------------------------------------------------------------
     */
 
-    Route::middleware(['auth','role:mahasiswa'])
-        ->prefix('mahasiswa')
-        ->name('mahasiswa.')
-        ->group(function () {
-
-            Route::get('/mahasiswa/dashboard', [MahasiswaDashboardController::class, 'index'])->name('mahasiswa.dashboard');
-
-            Route::get('/dokumen/{id}/pdf', [\Modules\Mahasiswa\Http\Controllers\StudentDocumentController::class, 'viewPdf'])->name('dokumen.pdf');
-      });
 });

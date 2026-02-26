@@ -1,7 +1,13 @@
 @extends('layouts.mantis')
 
-@section('content')
+{{-- Title --}}
 @section('title', 'Dashboard Mahasiswa')
+
+{{-- Header --}}
+@include('components.mantis.header', ['role' => 'mahasiswa'])
+
+{{-- Content --}}
+@section('content')
 <div class="container">
 
     @if (session('success'))
@@ -55,7 +61,7 @@
             <div class="col-auto">
                 <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
                     <option value="all" {{ ($status ?? 'all') === 'all' ? 'selected' : '' }}>Semua</option>
-                    <option value="approved_wadek" {{ ($status ?? '') === 'approved_wadek' ? 'selected' : '' }}>
+                    <option value="disetujui" {{ ($status ?? '') === 'disetujui' ? 'selected' : '' }}>
                         Disetujui Wadek</option>
                     <option value="verified_operator" {{ ($status ?? '') === 'verified_operator' ? 'selected' : '' }}>
                         Menunggu Wadek</option>
@@ -66,12 +72,19 @@
                     <option value="failed" {{ ($status ?? '') === 'failed' ? 'selected' : '' }}>Gagal Convert</option>
                 </select>
             </div>
-
-            <div class="col-auto">
-                <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary">Reset</a>
-            </div>
         </div>
     </form>
+
+    <div class="col-auto">
+        <form action="{{ route('mahasiswa.documents.clearDashboard') }}" method="POST" class="d-inline">
+            @csrf
+            @method('PUT')
+                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Sembunyikan dokumen (kecuali yang diterima)?')">
+                Reset Daftar
+                </button>
+        </form>
+
+    </div>
 
     <div class="row">
         @forelse($recentDocs as $d)
@@ -84,7 +97,7 @@
                         {{-- badge status --}}
                         <div class="mb-2">
                             @switch($d->status)
-                                @case('approved_wadek')
+                                @case('disetujui')
                                     <span class="badge bg-success">Disetujui Wadek</span>
                                 @break
 
@@ -138,8 +151,8 @@
                                 </button>
                             </form>
 
-                            {{-- Download PDF hanya jika status converted / approved_wadek --}}
-                            @if (!empty($d->pdf_path) && in_array($d->status, ['converted', 'approved_wadek', 'signed', 'signed_by_wadek'], true))
+                            {{-- Download PDF hanya jika status converted / disetujui --}}
+                            @if (!empty($d->pdf_path) && in_array($d->status, ['converted', 'disetujui', 'selesai', 'selesai_by_wadek'], true))
                                 <a class="btn btn-sm btn-success w-100 mt-2"
                                     href="{{ route('mahasiswa.documents.downloadPdf', $d->id) }}">
                                     Download PDF
@@ -147,13 +160,13 @@
                             @endif
 
                             @php
-                                $pdfFinal = $d->signed_pdf_path ?: $d->pdf_path;
+                                $pdfFinal = $d->selesai_pdf_path ?: $d->pdf_path;
                             @endphp
 
                             @if (!empty($pdfFinal))
-                                <a class="btn btn-sm {{ $d->signed_pdf_path ? 'btn-success' : 'btn-primary' }} w-100 mt-2"
-                                    href="{{ route('mahasiswa.dokumen.pdf', $d->id) }}" target="_blank" rel="noopener">
-                                    {{ $d->signed_pdf_path ? 'Lihat PDF TTD' : 'Lihat PDF' }}
+                                <a class="btn btn-sm {{ $d->selesai_pdf_path ? 'btn-success' : 'btn-primary' }} w-100 mt-2"
+                                    href="{{ route('mahasiswa.documents.downloadPdf', $d->id) }}" target="_blank" rel="noopener">
+                                    {{ $d->selesai_pdf_path ? 'Lihat PDF TTD' : 'Lihat PDF' }}
                                 </a>
                             @else
                                 <span class="text-muted">Belum ada PDF</span>

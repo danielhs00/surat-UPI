@@ -1,6 +1,7 @@
 @extends('layouts.mantis')
 
 @section('title', 'Hasil Pengajuan dari Wadek')
+@include('components.mantis.header', ['role' => 'operator'])
 
 @section('content')
     <div class="row">
