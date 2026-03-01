@@ -77,7 +77,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach ($pengajuans as $index => $pengajuan)
+                    @foreach ($pengajuans ?? collect() as $index => $pengajuan)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $pengajuan->user->mahasiswa->nim ?? 'N/A' }}</td>

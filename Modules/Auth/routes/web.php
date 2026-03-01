@@ -1,25 +1,46 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Auth\Http\Controllers\AuthController;
 use Modules\Auth\Http\Controllers\LoginController;
 
+Route::get('/', function () {
+    return view('auth::index');
+})->name('login');
 
+// tombol mahasiswa
+Route::get('/login/mahasiswa', [LoginController::class, 'startMahasiswaLogin'])
+    ->name('login.mahasiswa');
 
-// Login & Logout
-Route::get('/login', [LoginController::class, 'create'])->name('login');
-Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-Route::get('/logout', [LoginController::class, 'destroy'])->name('logout');
+// tombol operator
+Route::get('/login/operator', [LoginController::class, 'startOperatorLogin'])
+    ->name('login.operator');
 
-// Auth Module (protected)
-Route::middleware('web')
-->group(function () {
-    Route::get('/', [LoginController::class, 'create'])->name('login');
-    Route::post('/', [LoginController::class, 'store'])->name('login.store');
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-});
+// login admin & operator (email + password)
+Route::post('/login', [LoginController::class, 'login'])
+    ->name('login.post');
 
-route::middleware('auth')->group(function () {
-    // Tambahkan rute yang memerlukan autentikasi di sini
-    // Contoh: Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// callback CAS
+Route::get('/cas/login', [LoginController::class, 'casLogin'])
+    ->name('cas.login');
+
+Route::post('/logout', [LoginController::class, 'destroy'])
+    ->name('logout');
+
+Route::middleware(['auth', 'role:mahasiswa'])
+    ->prefix('mahasiswa')
+    ->name('mahasiswa.')
+    ->group(function () {
+        Route::get('/dashboard', function () {
+            return view('mahasiswa::dashboard');
+        })->name('dashboard');
+    });
+
+// Debug (opsional)
+Route::get('/debug-cas', function () {
+    return response()->json([
+        'app_url_config' => config('app.url'),
+        'cas_service_config' => config('cas.service'),
+        'cas_hostname_config' => config('cas.cas_hostname'),
+        'cas_uri_config' => config('cas.cas_uri'),
+    ]);
 });

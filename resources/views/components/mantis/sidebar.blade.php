@@ -103,6 +103,14 @@
                             <span class="pc-mtext">Kelola Wadek</span>
                         </a>
                     </li>
+
+                    {{-- route ini kamu punya: admin.operator --}}
+                    <li class="pc-item {{ $isActive('admin.opearator') }}">
+                        <a href="{{ route('admin.operator') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-users"></i></span>
+                            <span class="pc-mtext">Kelola Operator</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- Akun --}}

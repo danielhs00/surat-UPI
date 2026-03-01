@@ -16,6 +16,7 @@ use Modules\Wadek\Http\Controllers\WadekController;
 use App\Models\mahasiswa;
 use App\Models\operator;
 use App\Models\wadek;
+use Modules\Mahasiswa\Models\StudentDocument;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,18 +25,24 @@ use App\Models\wadek;
 */
 
 // Dashboard admin (punyamu)
-Route::middleware(['auth', 'role:admin', 'nocache'])
-    ->get('/admin/dashboard', function () {
-        $jumlah_mahasiswa = mahasiswa::count();
-        $jumlah_operator  = operator::count();
-        $jumlah_wadek     = wadek::count();
+Route::middleware(['auth','role:admin','Nocache'])->get('/admin/dashboard', function () {
 
-        return view('users::index', compact(
-            'jumlah_mahasiswa',
-            'jumlah_operator',
-            'jumlah_wadek'
-        ));
-    })->name('admin.dashboard');
+    $jumlah_mahasiswa = Mahasiswa::count();
+    $jumlah_operator  = Operator::count();
+    $jumlah_wadek     = Wadek::count();
+
+    $pengajuans = StudentDocument::with(['user.mahasiswa','template'])
+        ->orderByDesc('updated_at')
+        ->get();
+
+    return view('users::index', compact(
+        'pengajuans',
+        'jumlah_mahasiswa',
+        'jumlah_operator',
+        'jumlah_wadek',
+        'pengajuans'
+    ));
+})->name('admin.dashboard');
 
 // Pengajuan admin
 Route::middleware(['auth', 'role:admin', 'nocache'])
@@ -70,6 +77,11 @@ Route::middleware(['auth'])->group(function () {
         $jumlah_mahasiswa = mahasiswa::count();
         $jumlah_operator  = operator::count();
         $jumlah_wadek     = wadek::count();
+
+        $pengajuans = StudentDocument::with(['user.mahasiswa', 'template'])
+            ->orderByDesc('updated_at')
+            ->limit(10) // opsional
+            ->get();
 
         return view('users::index', compact(
             'jumlah_mahasiswa',
@@ -205,6 +217,7 @@ Route::middleware(['auth', 'role:operator', 'nocache'])
 
             Route::get('/documents/{id}/docx', [WadekController::class, 'downloadDocx'])->name('documents.docx');
         });
+    
     /*
     |--------------------------------------------------------------------------
     | router mahasiswa ada di module mahaswa
