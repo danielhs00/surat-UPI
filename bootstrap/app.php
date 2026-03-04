@@ -26,6 +26,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
+    ->withMiddleware(function (\Illuminate\Foundation\Configuration\Middleware $middleware) {
+    $middleware->alias([
+        'cas.auth' => \Subfission\Cas\Middleware\CASAuth::class,
+    ]);
+    })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

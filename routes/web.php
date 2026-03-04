@@ -15,38 +15,34 @@ use Modules\Master\Models\Fakultas;
 
 use App\Models\mahasiswa;
 use App\Models\operator;
-use App\Models\Prodi;
+use App\Models\wadek;
+use Modules\Mahasiswa\Models\StudentDocument;
 
-// =========================
-// RUTE PUBLIK (TIDAK PERLU LOGIN)
-// =========================
-// Route untuk mengambil data prodi berdasarkan fakultas (digunakan di dropdown)
-Route::get('/publik/prodi/{fakultas}', function ($fakultasId) {
-    // Bersihkan output buffer untuk menghindari deprecation warnings
-    while (ob_get_level()) {
-        ob_end_clean();
-    }
-    
-    // Matikan error reporting untuk route ini
-    error_reporting(0);
-    ini_set('display_errors', 0);
-    
-    // Set header JSON
-    header('Content-Type: application/json');
-    
-    try {
-        $prodi = DB::table('prodi')
-            ->where('fakultas_id', $fakultasId)
-            ->orderBy('nama_prodi')
-            ->get(['id', 'nama_prodi']);
-        
-        echo json_encode($prodi);
-    } catch (\Exception $e) {
-        echo json_encode(['error' => 'Gagal memuat data prodi']);
-    }
-    
-    exit;
-})->name('publik.prodi.by-fakultas');
+/*
+|--------------------------------------------------------------------------
+| Public routes
+|--------------------------------------------------------------------------
+*/
+
+// Dashboard admin (punyamu)
+Route::middleware(['auth','role:admin','Nocache'])->get('/admin/dashboard', function () {
+
+    $jumlah_mahasiswa = Mahasiswa::count();
+    $jumlah_operator  = Operator::count();
+    $jumlah_wadek     = Wadek::count();
+
+    $pengajuans = StudentDocument::with(['user.mahasiswa','template'])
+        ->orderByDesc('updated_at')
+        ->get();
+
+    return view('users::index', compact(
+        'pengajuans',
+        'jumlah_mahasiswa',
+        'jumlah_operator',
+        'jumlah_wadek',
+        'pengajuans'
+    ));
+})->name('admin.dashboard');
 
 // =========================
 // RUTE ADMIN (MEMERLUKAN LOGIN & ROLE ADMIN)
@@ -55,14 +51,62 @@ Route::middleware(['auth', 'role:admin', 'nocache'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        Route::get('/pengajuan', [PengajuanController::class, 'pengajuan'])
+            ->name('pengajuan');
+    });
 
-        // Dashboard admin
-        Route::get('/dashboard', [UsersController::class, 'dashboard'])
-            ->name('dashboard');
+// SSO routes (public)
+Route::get('/sso/login', [SsoController::class, 'redirect'])->name('sso.login');
+Route::get('/sso/callback', [SsoController::class, 'callback'])->name('sso.callback');
 
-        // Manajemen operator
-        Route::get('/operators/{operator}/edit', [UsersController::class, 'editOperator'])
-            ->name('operator.edit');
+/*
+|--------------------------------------------------------------------------
+| Authenticated routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+    // redirect setelah login (SSO)
+    Route::get('/redirect', [RedirectController::class, 'handle'])
+        ->name('redirect.after_login');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin
+    |--------------------------------------------------------------------------
+    */
+    Route::middleware(['auth', 'role:admin', 'nocache'])->get('/admin/dashboard', function () {
+        $jumlah_mahasiswa = mahasiswa::count();
+        $jumlah_operator  = operator::count();
+        $jumlah_wadek     = wadek::count();
+
+        $pengajuans = StudentDocument::with(['user.mahasiswa', 'template'])
+            ->orderByDesc('updated_at')
+            ->limit(10) // opsional
+            ->get();
+
+        return view('users::index', compact(
+            'jumlah_mahasiswa',
+            'jumlah_operator',
+            'jumlah_wadek'
+        ));
+    })->name('admin.dashboard');
+    
+
+    // Admin - Operator
+    Route::middleware(['role:admin'])->get('/admin/operator', [UsersController::class, 'operator'])->name('admin.operator');
+
+    Route::get('/admin/operator/tambah-operator', [UsersController::class, 'tambah_operator'])
+        ->middleware(['role:admin'])
+        ->name('tambah.operator');
+
+    Route::post('/admin/operator/simpan-operator', [UsersController::class, 'storeOperator'])
+        ->middleware(['role:admin'])
+        ->name('simpan.operator');
+
+    Route::get('/admin/operator/edit/{id}', [UsersController::class, 'editOperator'])
+        ->middleware(['role:admin'])
+        ->name('edit.operator');
 
         Route::put('/operators/{operator}/toggle', [UsersController::class, 'toggleOperator'])
             ->name('operator.toggle');
@@ -121,7 +165,36 @@ Route::get('/tambah', function () {
     return view('template::operator.templates.tambah');
 })->name('tambah');
 
-        /*
+    /*
+    |--------------------------------------------------------------------------
+    | Wadek
+    |--------------------------------------------------------------------------
+    */
+    // Route::middleware(['role:wadek'])->get('/wadek/dashboard', function () {
+    //     return view('wadek::dashboard'); // atau auth::dashboard
+    // });
+
+    Route::middleware(['auth', 'role:wadek', 'nocache'])
+        ->prefix('wadek')
+        ->name('wadek.')
+        ->group(function () {
+
+            Route::get('/dashboard', [WadekDashboardController::class, 'index'])->name('dashboard');
+
+            Route::get('/documents/{id}', [WadekController::class, 'show'])->name('documents.show');
+
+            Route::get('/documents/{id}/pdf', [WadekController::class, 'viewPdf'])->name('documents.pdf');
+
+            Route::put('/documents/{id}/sign', [WadekController::class, 'sign'])->name('documents.sign');
+
+            Route::put('/documents/{id}/reject', [WadekController::class, 'reject'])->name('documents.reject');
+
+            Route::post('/signature', [WadekController::class, 'uploadSignature'])->name('signature.upload');
+
+            Route::get('/documents/{id}/docx', [WadekController::class, 'downloadDocx'])->name('documents.docx');
+        });
+    
+    /*
     |--------------------------------------------------------------------------
     | router mahasiswa ada di module mahaswa
     |--------------------------------------------------------------------------

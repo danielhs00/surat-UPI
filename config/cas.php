@@ -6,7 +6,11 @@ return [
     |--------------------------------------------------------------------------
     | Example: 'cas.myuniv.edu'.
     */
+<<<<<<< HEAD
     'cas_hostname' => env('CAS_HOSTNAME', 'cas.myuniv.edu'),
+=======
+    'cas_hostname' => env('CAS_HOSTNAME', 'sso.upi.edu'),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -16,7 +20,14 @@ return [
     | recommended for protecting against DOS attacks.  If using load
     | balanced hosts, then separate each with a comma.
     */
+<<<<<<< HEAD
     'cas_real_hosts' => env('CAS_REAL_HOSTS', 'cas.myuniv.edu'),
+=======
+    'cas_real_hosts' => env('CAS_REAL_HOSTS'),
+    'cas_real_hostname' => env('CAS_REAL_HOSTNAME', parse_url(env('APP_URL'), PHP_URL_HOST)),
+    'cas_real_port'     => (int) env('CAS_REAL_PORT', 443),
+    'cas_real_uri'      => env('CAS_REAL_URI', ''),
+>>>>>>> sso
 
 
     /*
@@ -49,7 +60,11 @@ return [
     |--------------------------------------------------------------------------
     | Usually 443
     */
+<<<<<<< HEAD
     'cas_port' => env('CAS_PORT', 443),
+=======
+    'cas_port' => (int) env('CAS_PORT', 443),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +80,11 @@ return [
     |--------------------------------------------------------------------------
     | Example: 'http://localhost', 'https://example.com:8888'
     */
+<<<<<<< HEAD
     'cas_client_service' => env('CAS_CLIENT_SERVICE', 'http://localhost'),
+=======
+    'cas_client_service' => env('CAS_CLIENT_SERVICE'),
+>>>>>>> sso
 
 
     /*
@@ -77,7 +96,11 @@ return [
     |
     | VALIDATING THE CAS SERVER IS CRUCIAL TO THE SECURITY OF THE CAS PROTOCOL
     */
+<<<<<<< HEAD
     'cas_validation' => env('CAS_VALIDATION', ''),
+=======
+    'cas_validation' => env('CAS_VALIDATION'),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +119,11 @@ return [
     | intermediaries, here is where you can.  Recommended to leave
     | this set with default (true).
     */
+<<<<<<< HEAD
     'cas_validate_cn' => env('CAS_VALIDATE_CN', true),
+=======
+    'cas_validate_cn' => env('CAS_VALIDATE_CN'),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -104,14 +131,22 @@ return [
     |--------------------------------------------------------------------------
     | Empty is fine
     */
+<<<<<<< HEAD
     'cas_login_url' => env('CAS_LOGIN_URL', ''),
+=======
+    'cas_login_url'  => env('CAS_LOGIN_URL', 'https://sso.upi.edu/cas/login'),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
     | CAS Logout URI
     |--------------------------------------------------------------------------
     */
+<<<<<<< HEAD
     'cas_logout_url' => env('CAS_LOGOUT_URL', 'https://cas.myuniv.edu/cas/logout'),
+=======
+    'cas_logout_url' => env('CAS_LOGOUT_URL', 'https://sso.upi.edu/cas/logout'),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -139,7 +174,11 @@ return [
     | this feature, you may be able to retrieve user meta data.
     |--------------------------------------------------------------------------
     */
+<<<<<<< HEAD
     'cas_enable_saml' => env('CAS_ENABLE_SAML', true),
+=======
+    'cas_enable_saml' => env('CAS_ENABLE_SAML', false),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -148,7 +187,11 @@ return [
     | will override this configuration.
     |--------------------------------------------------------------------------
     */
+<<<<<<< HEAD
     'cas_version' => env('CAS_VERSION', "2.0"),
+=======
+    'cas_version' => env('CAS_VERSION', "3.0"),
+>>>>>>> sso
 
     /*
     |--------------------------------------------------------------------------
@@ -189,4 +232,8 @@ return [
     | Whether to add the Secure flag to cookies.
      */
     'cas_session_secure' => env('HTTPS_ONLY_COOKIES', false),
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> sso

@@ -7,12 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class mahasiswa extends Model
 {
     protected $table = 'mahasiswa';
-    protected $fillable = [
-        'user_id',
-        'fakultas_id',
-        'prodi_id',
-        'nim'
-    ];
+    protected $fillable = ['user_id','nim','prodi','angkatan'];
 
     public function user()
     {
@@ -21,6 +16,6 @@ class mahasiswa extends Model
 
     public function fakultas()
     {
-        return $this->belongsTo(\Modules\Master\Models\Fakultas::class);
+        return $this->belongsTo(\Modules\Master\Models\Fakultas::class, 'fakultas_id');
     }
 }

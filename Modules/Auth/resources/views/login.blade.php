@@ -56,7 +56,7 @@
                         <div class="justify-content-between align-items-end mb-4">
                             <h3 class="mb-0"><b>Login</b></h3>
                         </div>
-                        <form method="POST" action="{{ route('login') }}">
+                        <form method="POST" action="{{ route('login.post') }}">
                             @csrf
 
                             <div class="form-group mb-3">
@@ -87,10 +87,10 @@
                 <div class="auth-footer row">
                     <!-- <div class=""> -->
                     <div class="col my-1">
-                        <p class="m-0">Copyright © <a href="#">Codedthemes</a></p>
+                        <p class="m-0">Copyright © <a href="#">Daniel dan Mirza</a></p>
                     </div>
                     <div class="col my-1">
-                        <p class="m-0">Distributed by <a href="https://themewagon.com">ThemeWagon</a></p>
+                        <p class="m-0">Website <a href="#">Surat UPI</a></p>
                     </div>
                     <!-- </div> -->
                 </div>
@@ -143,4 +143,3 @@
 <!-- [Body] end -->
 
 </html>
-
