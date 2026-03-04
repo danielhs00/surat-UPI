@@ -150,6 +150,9 @@ Route::middleware(['auth', 'role:operator', 'nocache'])
         Route::get('/', [TemplateController::class, 'index'])->name('index');
         Route::get('/create', [TemplateController::class, 'create'])->name('create');
         Route::post('/store', [TemplateController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [TemplateController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [TemplateController::class, 'update'])->name('update');
+        Route::delete('/{id}', [TemplateController::class, 'destroy'])->name('destroy');
     });
 
 Route::middleware(['auth', 'role:operator', 'nocache'])
