@@ -18,7 +18,13 @@ class StudentDocumentController extends Controller
     use AuthorizesRequests;
     public function downloadTemplate(Template $template)
     {
-        abort_unless($template->is_active, 404);
+        $path = $document->signed_pdf_path ?: $document->pdf_path;
+
+        abort_unless($path, 404);
+        abort_unless(Storage::disk('local')->exists($path), 404);
+
+        $filename = ($document->title ?: 'document') . '.pdf';
+        return Storage::disk('local')->download($path, $filename);
 
         $url = $template->google_docs_url;
 
@@ -74,13 +80,12 @@ class StudentDocumentController extends Controller
 
     public function downloadPdf(StudentDocument $document)
     {
-        $this->authorize('view', $document);
+        $path = $document->signed_pdf_path ?: $document->pdf_path;
 
-        abort_unless($document->pdf_path, 404);
-        abort_unless(Storage::disk('local')->exists($document->pdf_path), 404);
+        abort_unless($path, 404);
+        abort_unless(Storage::disk('local')->exists($path), 404);
 
-        $filename = ($document->title ?: 'document') . '.pdf';
-        return Storage::disk('local')->download($document->pdf_path, $filename);
+        return Storage::disk('local')->download($path);
     }
 
     public function fromTemplate(Template $template)
@@ -115,33 +120,62 @@ class StudentDocumentController extends Controller
 
     public function viewPdf($id)
     {
-        $doc = StudentDocument::findOrFail($id);
+        $document = \Modules\Mahasiswa\Models\StudentDocument::findOrFail($id);
 
-        // hanya pemilik dokumen (mahasiswa) yang boleh lihat
-        abort_unless($doc->user_id === auth()->id(), 403);
+        abort_unless($document->user_id === auth()->id(), 403);
 
-        // prioritas PDF berttd
-        $path = $doc->signed_pdf_path ?: $doc->pdf_path;
+        $path = $document->signed_pdf_path ?: $document->pdf_path;
         abort_unless($path, 404, 'PDF belum tersedia');
-        abort_unless(Storage::disk('local')->exists($path), 404, 'File PDF tidak ditemukan');
+        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($path), 404, 'File PDF tidak ditemukan');
 
-        return response()->file(Storage::disk('local')->path($path), [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="dokumen-' . $doc->id . '.pdf"',
-        ]);
+        return response()->file(
+            \Illuminate\Support\Facades\Storage::disk('local')->path($path),
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="dokumen-' . $document->id . '.pdf"',
+            ]
+        );
     }
 
     //RESET STATUS DOKUMEN
     public function dashboard(Request $request)
-{
-    $status = $request->query('status', 'all');
+    {
+        $status = $request->query('status', 'all');
 
-    dd([
-        'full_url' => $request->fullUrl(),
-        'status_query' => $request->query('status'),
-        'status_var' => $status,
-    ]);
+        dd([
+            'full_url' => $request->fullUrl(),
+            'status_query' => $request->query('status'),
+            'status_var' => $status,
+        ]);
 
-    // kode bawah ini tidak akan jalan karena dd() menghentikan program
-}
+        // kode bawah ini tidak akan jalan karena dd() menghentikan program
+    }
+
+    public function resubmit($id)
+    {
+        $document = \Modules\Mahasiswa\Models\StudentDocument::findOrFail($id);
+
+        // pastikan dokumen milik mahasiswa yang login
+        abort_unless($document->user_id === auth()->id(), 403);
+
+        // hanya boleh ajukan ulang jika ditolak
+        if ($document->status !== 'rejected') {
+            return back()->with('error', 'Dokumen tidak dapat diajukan ulang.');
+        }
+
+        $document->status = 'revisi';
+        $document->catatan_operator = null;
+        $document->hidden_in_dashboard = 0;
+
+        $document->approved_at = null;
+        $document->approved_by = null;
+        $document->nomor_surat = null;
+        $document->signed_pdf_path = null;
+
+        $document->save();
+
+        return redirect()
+            ->route('mahasiswa.dashboard')
+            ->with('success', 'Dokumen berhasil diajukan ulang. Silakan upload ulang berkas.');
+    }
 }

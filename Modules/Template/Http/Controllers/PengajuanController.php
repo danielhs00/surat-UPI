@@ -20,6 +20,7 @@ class PengajuanController extends Controller
         // contoh: operator lihat dokumen yang sudah diupload mahasiswa
         $documents = StudentDocument::with(['user', 'template'])
             ->orderByDesc('updated_at')
+            ->orderByDesc('approved_at')
             ->get();
 
         return view('operator::pengajuan.index', compact('documents'));
@@ -55,7 +56,47 @@ class PengajuanController extends Controller
         return view('template::edit', compact('pengajuan'));
     }
 
-    public function destroy($id) {}
+    public function destroy($id)
+    {
+        abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
+
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        abort_unless($op, 403, 'Data operator tidak ditemukan');
+
+        $doc = StudentDocument::with(['template', 'versions'])->findOrFail($id);
+
+        // operator hanya boleh hapus dokumen fakultasnya
+        $docFakultasId = $doc->template->fakultas_id ?? null;
+        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+
+        $disk = Storage::disk('local');
+
+        // hapus file utama kalau ada
+        foreach (['docx_path', 'pdf_path', 'signed_pdf_path'] as $field) {
+            $path = $doc->{$field} ?? null;
+            if ($path && $disk->exists($path)) {
+                $disk->delete($path);
+            }
+        }
+
+        // hapus file versi (kalau kamu punya relasi versions)
+        if (method_exists($doc, 'versions')) {
+            foreach ($doc->versions as $v) {
+                if (!empty($v->docx_path) && $disk->exists($v->docx_path)) $disk->delete($v->docx_path);
+                if (!empty($v->pdf_path) && $disk->exists($v->pdf_path)) $disk->delete($v->pdf_path);
+            }
+            $doc->versions()->delete();
+        }
+
+        // hapus folder dokumen user/id kalau kamu simpan di sana (opsional tapi rapi)
+        $disk->deleteDirectory('mahasiswa/documents/' . $doc->user_id);
+
+        $doc->delete();
+
+        return redirect()
+            ->route('operator.pengajuan')
+            ->with('success', 'Pengajuan berhasil dihapus.');
+    }
 
 
     public function pengajuan()
@@ -76,19 +117,22 @@ class PengajuanController extends Controller
 
     public function update(Request $request, $id)
     {
+        $pengajuan = StudentDocument::findOrFail($id);
+
         $validated = $request->validate([
-            'status' => 'required|in:draft,uploaded,converting,converted,failed',
+            'status' => 'required|in:draft,mengupload,converting,converted,gagal,submitted,processing_offline,completed,rejected',
             'catatan_operator' => 'nullable|string',
         ]);
 
-        $pengajuan = StudentDocument::findOrFail($id);
+        // ✅ cegah completed kalau belum ada pdf final
+        if ($validated['status'] === 'completed' && empty($pengajuan->signed_pdf_path)) {
+            return back()->with('error', 'Tidak bisa set completed sebelum upload PDF final.');
+        }
 
         $pengajuan->status = $validated['status'];
 
-        // Kalau kolom catatan_operator belum ada di tabel, komentari 2 baris ini
-        if (array_key_exists('catatan_operator', $validated)) {
-            $pengajuan->catatan_operator = $validated['catatan_operator'];
-        }
+        // kolom ini ada di tabel kamu, jadi aman
+        $pengajuan->catatan_operator = $validated['catatan_operator'] ?? null;
 
         $pengajuan->save();
 
@@ -96,28 +140,36 @@ class PengajuanController extends Controller
             ->route('operator.pengajuan.edit', $pengajuan->id)
             ->with('success', 'Perubahan berhasil disimpan.');
     }
-
-    public function kirimKeWadek($id)
+    public function markOffline($id)
     {
-        $pengajuan = StudentDocument::findOrFail($id);
+        abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
 
-        // aturan sederhana: hanya boleh kirim kalau sudah uploaded/converted
-        if (!in_array($pengajuan->status, ['uploaded', 'converted'], true)) {
-            return back()->with('error', 'Pengajuan belum siap dikirim ke Wadek.');
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        abort_unless($op, 403, 'Data operator tidak ditemukan');
+
+        $doc = StudentDocument::with(['template'])->findOrFail($id);
+
+        $docFakultasId = $doc->template->fakultas_id ?? null;
+        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+
+        // boleh ditandai offline jika sudah siap (silakan sesuaikan)
+        if (!in_array($doc->status, ['converted', 'submitted', 'mengupload'], true)) {
+            return back()->with('error', 'Dokumen belum siap diproses offline.');
         }
 
-        $pengajuan->status = 'sent_to_wadek';
+        $doc->status = 'processing_offline';
 
-        // opsional: tandai waktu dikirim (pakai submitted_at kalau kamu ingin)
-        if (empty($pengajuan->submitted_at)) {
-            $pengajuan->submitted_at = now();
+        // pakai kolom yang sudah ada:
+        // submitted_at kita manfaatkan sebagai "mulai diproses operator"
+        if (empty($doc->submitted_at)) {
+            $doc->submitted_at = now();
         }
 
-        $pengajuan->save();
+        $doc->save();
 
         return redirect()
-            ->route('operator.pengajuan.edit', $pengajuan->id)
-            ->with('success', 'Pengajuan berhasil dikirim ke Wadek.');
+            ->route('operator.pengajuan.edit', $doc->id)
+            ->with('success', 'Ditandai: Diproses Offline (menunggu TTD wadek + nomor surat).');
     }
 
     public function viewPdf($id)
@@ -149,6 +201,46 @@ class PengajuanController extends Controller
                 'Content-Disposition' => 'inline; filename="dokumen-' . $doc->id . '.pdf"',
             ]
         );
+    }
+
+    public function complete(Request $request, $id)
+    {
+        abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
+
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        abort_unless($op, 403, 'Data operator tidak ditemukan');
+
+        $doc = StudentDocument::with(['template'])->findOrFail($id);
+
+        $docFakultasId = $doc->template->fakultas_id ?? null;
+        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+
+        abort_unless($doc->status === 'processing_offline', 403, 'Dokumen belum diproses offline.');
+
+        $validated = $request->validate([
+            'nomor_surat' => 'required|string|max:255',
+            'signed_pdf'  => 'required|file|mimes:pdf|max:5120',
+        ]);
+
+        $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');
+
+        $doc->nomor_surat   = $validated['nomor_surat'];
+        $doc->signed_pdf_path = $path;
+
+        // selesai versi operator
+        $doc->nomor_surat = $validated['nomor_surat'];
+        $doc->signed_pdf_path = $path;
+        $doc->status = 'completed';
+        $doc->approved_at = now();
+        $doc->approved_by = auth()->id();
+
+        $doc->hidden_in_dashboard = 0; // WAJIB
+
+        $doc->save();
+
+        return redirect()
+            ->route('operator.pengajuan.edit', $doc->id)
+            ->with('success', 'Surat final berhasil diupload. Mahasiswa sekarang bisa melihat/unduh di website.');
     }
 
     public function viewPdfOperator($id)
@@ -197,10 +289,17 @@ class PengajuanController extends Controller
         return Storage::disk('local')->download($doc->docx_path, $filename);
     }
 
-    public function hasilWadek()
+    public function pengajuanHasil()
     {
-        $pengajuans = \Modules\Mahasiswa\Models\StudentDocument::with(['user.mahasiswa.fakultas', 'template'])
-            ->whereIn('status', ['signed', 'rejected', 'signed_by_wadek', 'rejected_by_wadek'])
+        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+
+        $pengajuans = StudentDocument::with(['user.mahasiswa.fakultas', 'template'])
+            ->when($op, function ($q) use ($op) {
+                $q->whereHas('template', function ($t) use ($op) {
+                    $t->where('fakultas_id', $op->fakultas_id);
+                });
+            })
+            ->whereIn('status', ['completed', 'rejected'])
             ->orderByDesc('updated_at')
             ->get();
 

@@ -27,6 +27,7 @@
                                     <th>Template</th>
                                     <th>Status</th>
                                     <th>Nomor Surat</th>
+                                    <th>Tanggal Selesai</th>
                                     <th>Catatan Wadek</th>
                                     <th class="text-end">Aksi</th>
                                 </tr>
@@ -51,6 +52,9 @@
                                         </td>
 
                                         <td>{{ $p->nomor_surat ?? '-' }}</td>
+                                         <td>
+                                            {{ optional($p->approved_at ?: $p->updated_at)->format('d M Y H:i') }}
+                                        </td>
                                         <td>{{ $p->catatan_wadek ?? '-' }}</td>
 
                                         <td class="text-end">

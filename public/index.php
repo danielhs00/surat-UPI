@@ -1,5 +1,12 @@
 <?php
 
+// Matikan semua error reporting untuk output
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+
+// ... kode selanjutnya
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

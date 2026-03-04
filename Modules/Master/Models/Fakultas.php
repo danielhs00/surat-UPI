@@ -4,7 +4,7 @@ namespace Modules\Master\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Modules\Master\Database\Factories\FakultasFactory;
+use Modules\Master\Database\Factories\FakultasFactory;
 
 class Fakultas extends Model
 {
@@ -13,7 +13,7 @@ class Fakultas extends Model
     /**
      * The attributes that are mass assignable.
      */
-     protected $table = 'fakultas';
+    protected $table = 'fakultas';
     protected $fillable = [
         'nama_fakultas',
         'kode_fakultas',
@@ -34,8 +34,8 @@ class Fakultas extends Model
         return $this->hasOne(\App\Models\Wadek::class);
     }
 
-    // protected static function newFactory(): FakultasFactory
-    // {
-    //     // return FakultasFactory::new();
-    // }
+    protected static function newFactory()
+    {
+        return \Modules\Master\Database\Factories\FakultasFactory::new();
+    }
 }

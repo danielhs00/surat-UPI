@@ -4,7 +4,6 @@
     $dashboardRoute = match ($role) {
         'mahasiswa' => route('mahasiswa.dashboard'),
         'operator' => route('operator.dashboard'),
-        'wadek' => route('wadek.dashboard'),
         'admin' => route('admin.dashboard'),
         default => route('dashboard'),
     };
@@ -18,7 +17,8 @@
     <div class="navbar-wrapper">
         <div class="m-header">
             <a href="{{ $dashboardRoute }}" class="b-brand text-primary">
-                <img src="{{ asset('assets/images/logo_surat.png') }}" class="img-fluid logo-lg" alt="logo" width="50px">
+                <img src="{{ asset('assets/images/logo_surat.png') }}" class="img-fluid logo-lg" alt="logo"
+                    width="50px">
             </a>
         </div>
 
@@ -38,11 +38,18 @@
                             <span class="pc-mtext">Dokumen Saya</span>
                         </a>
                     </li>
+
+                    <li class="pc-item {{ request()->routeIs('mahasiswa.surat.selesai') ? 'active' : '' }}">
+                        <a href="{{ route('mahasiswa.surat.selesai') }}" class="pc-link">
+                            <span class="pc-micon"><i class="ti ti-file-check"></i></span>
+                            <span class="pc-mtext">Surat Selesai</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- Operator --}}
                 @if ($role === 'operator')
-                <li class="pc-item pc-caption">
+                    <li class="pc-item pc-caption">
                         <label>Operator</label>
                         <i class="ti ti-settings"></i>
                     </li>
@@ -61,23 +68,7 @@
                     <li class="pc-item {{ request()->routeIs('operator.pengajuan.hasil') ? 'active' : '' }}">
                         <a href="{{ route('operator.pengajuan.hasil') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-file-check"></i></span>
-                            <span class="pc-mtext">Hasil Wadek</span>
-                        </a>
-                    </li>
-
-                @endif
-
-                {{-- Wadek --}}
-                @if ($role === 'wadek')
-                    <li class="pc-item pc-caption">
-                        <label>Wadek</label>
-                        <i class="ti ti-signature"></i>
-                    </li>
-
-                    <li class="pc-item {{ $isActive('wadek.dashboard') }}">
-                        <a href="{{ route('wadek.dashboard') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-signature"></i></span>
-                            <span class="pc-mtext">Persetujuan Surat</span>
+                            <span class="pc-mtext">Pengajuan Hasil</span>
                         </a>
                     </li>
                 @endif
@@ -93,14 +84,6 @@
                         <a href="{{ route('admin.dashboard') }}" class="pc-link">
                             <span class="pc-micon"><i class="ti ti-layout-dashboard"></i></span>
                             <span class="pc-mtext">Dashboard Admin</span>
-                        </a>
-                    </li>
-
-                    {{-- route ini kamu punya: admin.wadek --}}
-                    <li class="pc-item {{ $isActive('admin.wadek') }}">
-                        <a href="{{ route('admin.wadek') }}" class="pc-link">
-                            <span class="pc-micon"><i class="ti ti-users"></i></span>
-                            <span class="pc-mtext">Kelola Wadek</span>
                         </a>
                     </li>
                 @endif
