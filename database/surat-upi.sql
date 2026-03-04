@@ -19,24 +19,24 @@
 -- Dumping data for table surat_upi.cache_locks: ~0 rows (approximately)
 
 -- Dumping data for table surat_upi.document_versions: ~3 rows (approximately)
-INSERT IGNORE INTO `document_versions` (`id`, `student_document_id`, `version`, `docx_path`, `pdf_path`, `note`, `created_at`, `updated_at`) VALUES
+INSERT INTO `document_versions` (`id`, `student_document_id`, `version`, `docx_path`, `pdf_path`, `note`, `created_at`, `updated_at`) VALUES
 	(3, 2, 1, 'mahasiswa/documents/1/docx/2-1772505910.docx', NULL, 'Upload v1', '2026-03-02 19:45:11', '2026-03-02 19:45:11'),
 	(4, 2, 2, 'mahasiswa/documents/1/docx/2-1772506114.docx', NULL, 'Upload v2', '2026-03-02 19:48:34', '2026-03-02 19:48:34'),
 	(5, 2, 3, 'mahasiswa/documents/1/docx/2-1772506275.docx', 'mahasiswa/documents/1/2.pdf', 'Upload v3', '2026-03-02 19:51:15', '2026-03-02 19:51:25');
 
 -- Dumping data for table surat_upi.fakultas: ~1 rows (approximately)
-INSERT IGNORE INTO `fakultas` (`id`, `nama_fakultas`, `kode_fakultas`, `created_at`, `updated_at`) VALUES
+INSERT INTO `fakultas` (`id`, `nama_fakultas`, `kode_fakultas`, `created_at`, `updated_at`) VALUES
 	(1, 'Kampus Daerah Dicibiru', '1', '2026-02-28 21:55:02', '2026-02-28 21:55:02');
 
 -- Dumping data for table surat_upi.jobs: ~0 rows (approximately)
 
 -- Dumping data for table surat_upi.mahasiswa: ~2 rows (approximately)
-INSERT IGNORE INTO `mahasiswa` (`id`, `user_id`, `fakultas_id`, `nim`, `prodi`, `created_at`, `updated_at`) VALUES
+INSERT INTO `mahasiswa` (`id`, `user_id`, `fakultas_id`, `nim`, `prodi`, `created_at`, `updated_at`) VALUES
 	(1, 1, 1, '2312109', 'UNKNOWN', '2026-03-02 19:41:49', '2026-03-02 19:41:49'),
 	(2, 4, 1, '2307519', 'UNKNOWN', '2026-03-02 20:00:05', '2026-03-02 20:00:05');
 
 -- Dumping data for table surat_upi.migrations: ~27 rows (approximately)
-INSERT IGNORE INTO `migrations` (`id`, `migration`, `batch`) VALUES
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(1, '0001_01_01_000000_create_users_table', 1),
 	(2, '2026_02_18_041242_create_fakultas_table', 2),
 	(3, '2026_02_18_041931_add_fakultas_id_to_operator_table', 2),
@@ -66,13 +66,13 @@ INSERT IGNORE INTO `migrations` (`id`, `migration`, `batch`) VALUES
 	(27, '2026_03_03_025041_create_jobs_table', 6);
 
 -- Dumping data for table surat_upi.operator: ~1 rows (approximately)
-INSERT IGNORE INTO `operator` (`id`, `user_id`, `fakultas_id`, `created_at`, `updated_at`) VALUES
+INSERT INTO `operator` (`id`, `user_id`, `fakultas_id`, `created_at`, `updated_at`) VALUES
 	(1, 1, 1, '2026-02-28 21:58:25', '2026-02-28 21:58:25');
 
 -- Dumping data for table surat_upi.password_reset_tokens: ~0 rows (approximately)
 
 -- Dumping data for table surat_upi.sessions: ~15 rows (approximately)
-INSERT IGNORE INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
 	('91EUqJZvRWixXHMWVnJm5Z2LeiOXdEVE0W7HnmdV', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoieGNLcVZPZ1p5Q2NiNXM2T0F4RFg2ZGcySm9lM3RtWUxtMmlVempEOSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1772512395),
 	('bYgTcixUsXjnjGMv7uIhqP2N8lFGAa3BsRUFxwGZ', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiY0gzSjc5S2R5SEtnUVYzQm9XYTVlM2xDY0JSNXI1WUdvcWpZOEpoViI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDM6Imh0dHBzOi8vc3VyYXQudXBpLnRlc3RzL21haGFzaXN3YS9kYXNoYm9hcmQiO31zOjg6ImNhc19yb2xlIjtzOjk6Im1haGFzaXN3YSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1772508929),
 	('CeT39b53haWoyJ0UXiUfSmL4fklRiCTpVIPM6ZUV', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiYjlkZnlCbjhERFRUa0I4czlQdFpmM0JxUk9rUlZCV3ZUcEhXNnJDViI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDM6Imh0dHBzOi8vc3VyYXQudXBpLnRlc3RzL21haGFzaXN3YS9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjg6ImNhc19yb2xlIjtzOjk6Im1haGFzaXN3YSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6NDt9', 1772506826),
@@ -90,18 +90,18 @@ INSERT IGNORE INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `pay
 	('zaxOCcFBj7298YHhTbecGKn8kMpyBddtkBDificA', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiUTdWREg1UDhXckpLUG05TGZMMXU1YjViaEhEY1NITlNOYmVPYVUxbCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czozOiJ1cmwiO2E6MTp7czo4OiJpbnRlbmRlZCI7czo0MzoiaHR0cHM6Ly9zdXJhdC51cGkudGVzdHMvbWFoYXNpc3dhL2Rhc2hib2FyZCI7fXM6OToiX3ByZXZpb3VzIjthOjE6e3M6MzoidXJsIjtzOjMzOiJodHRwczovL3N1cmF0LnVwaS50ZXN0cy9jYXMvbG9naW4iO31zOjg6ImNhc19yb2xlIjtzOjk6Im1haGFzaXN3YSI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1772512674);
 
 -- Dumping data for table surat_upi.student_documents: ~4 rows (approximately)
-INSERT IGNORE INTO `student_documents` (`id`, `user_id`, `template_id`, `title`, `docx_path`, `pdf_path`, `signed_pdf_path`, `status`, `hidden_in_dashboard`, `nomor_surat`, `catatan_wadek`, `signed_by`, `signed_at`, `submitted_at`, `converted_at`, `convert_error`, `catatan_operator`, `created_at`, `updated_at`) VALUES
+INSERT INTO `student_documents` (`id`, `user_id`, `template_id`, `title`, `docx_path`, `pdf_path`, `signed_pdf_path`, `status`, `hidden_in_dashboard`, `nomor_surat`, `catatan_wadek`, `signed_by`, `signed_at`, `submitted_at`, `converted_at`, `convert_error`, `catatan_operator`, `created_at`, `updated_at`) VALUES
 	(1, 1, 1, 'dispen', NULL, NULL, NULL, 'draft', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-02-28 15:46:24', '2026-02-28 15:46:33'),
 	(2, 1, 1, 'dispen', 'mahasiswa/documents/1/docx/2-1772506275.docx', 'mahasiswa/documents/1/2.pdf', NULL, 'converted', 0, NULL, NULL, NULL, NULL, '2026-03-02 19:51:15', '2026-03-02 19:51:25', NULL, NULL, '2026-03-02 19:44:48', '2026-03-02 19:51:25'),
 	(3, 4, 1, 'dispen', NULL, NULL, NULL, 'draft', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-02 20:00:25', '2026-03-02 20:00:25'),
 	(4, 1, 1, 'dispen', NULL, NULL, NULL, 'draft', 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-03-02 21:36:34', '2026-03-02 21:36:34');
 
 -- Dumping data for table surat_upi.templates: ~1 rows (approximately)
-INSERT IGNORE INTO `templates` (`id`, `fakultas_id`, `uploaded_by`, `nama_template`, `jenis_surat`, `deskripsi`, `google_docs_url`, `is_active`, `created_at`, `updated_at`) VALUES
+INSERT INTO `templates` (`id`, `fakultas_id`, `uploaded_by`, `nama_template`, `jenis_surat`, `deskripsi`, `google_docs_url`, `is_active`, `created_at`, `updated_at`) VALUES
 	(1, 1, 3, 'dispen', 'Dispen', '1 taun', 'https://docs.google.com/document/d/1dvRAXxrNm48jHiM92hHEOx4kqLTYacJG7ladHBfpE2Y/edit?tab=t.0', 1, '2026-02-28 15:45:11', '2026-02-28 15:45:11');
 
 -- Dumping data for table surat_upi.upi_fak: ~15 rows (approximately)
-INSERT IGNORE INTO `upi_fak` (`FAK`, `NAMAFAK`, `NAMAFAK2`, `NAMAFAK3`, `NAMAFAK4`, `NAMAFAK4E`, `NAMAFAK5`, `FAKKAM`, `NAMAPIMP`, `NIPPIMP`, `NAMAPD1`, `NIPPD1`, `CREATEDBY`, `CREATEDDATE`, `MODIFYBY`, `MODIFYDATE`, `URUTFAK`) VALUES
+INSERT INTO `upi_fak` (`FAK`, `NAMAFAK`, `NAMAFAK2`, `NAMAFAK3`, `NAMAFAK4`, `NAMAFAK4E`, `NAMAFAK5`, `FAKKAM`, `NAMAPIMP`, `NIPPIMP`, `NAMAPD1`, `NIPPD1`, `CREATEDBY`, `CREATEDDATE`, `MODIFYBY`, `MODIFYDATE`, `URUTFAK`) VALUES
 	('A', 'ILMU PENDIDIKAN', 'ILMU PENDIDIKAN', 'FIP', 'FAKULTAS ILMU PENDIDIKAN', 'FACULTY OF EDUCATION', 'FIP', 'FAKULTAS', 'Aan Komariah', 197005241994022001, 'Dr. Sardin, S.Pd., M.Si.', 197108171998021002, '', '4/3/2014 14:10:35', 'SIAK011', '5/2/2026 12:09:48', 1),
 	('B', 'PENDIDIKAN ILMU PENGETAHUAN SOSIAL', 'PEND. ILMU PENGETAHUAN SOSIAL', 'FPIPS', 'FAKULTAS PENDIDIKAN ILMU PENGETAHUAN SOSIAL', 'FACULTY OF SOCIAL SCIENCE EDUCATION', 'FPIPS', 'FAKULTAS', 'Cecep Darmawan', 196909291994021001, 'Dr. Fitri Rahmafitria, M.Si.', 197410182008122001, '', '', 'OPR039', '15/4/2025 12:36:56', 2),
 	('C', 'PENDIDIKAN BAHASA DAN SASTRA', 'PEND. BAHASA DAN SENI', 'FPBS', 'FAKULTAS PENDIDIKAN BAHASA DAN SASTRA', 'FACULTY OF LANGUAGE AND LITERATURE EDUCATION', 'FPBS', 'FAKULTAS', 'Wawan Gunawan', 197209162000031001, 'Prof. Dr. Yulianeta, M.Pd.', 197507132005012002, '', '', 'SIAK024', '30/8/2025 18:59:24', 3),
@@ -119,7 +119,7 @@ INSERT IGNORE INTO `upi_fak` (`FAK`, `NAMAFAK`, `NAMAFAK2`, `NAMAFAK3`, `NAMAFAK
 	('P', 'PASCASARJANA', 'PASCASARJANA', 'SPS', 'SEKOLAH PASCASARJANA', 'SCHOOL OF POSTGRADUATE STUDIES', 'SPS', 'SEKOLAH', 'Juntika', 196606011991031005, 'Prof. Dr. Ade Gafar Abdullah, S.Pd., M.Si.', 197211131999031001, '', '', 'SIAK002', '9/4/2025 13:24:12', 10);
 
 -- Dumping data for table surat_upi.upi_fjp: ~1.072 rows (approximately)
-INSERT IGNORE INTO `upi_fjp` (`KODEPST`, `KODEPST1`, `KODEPSTB`, `KODEPSTBB`, `KODEPSTK`, `NAMAPST`, `NAMAPSTE`, `JENJANG`, `DIKTI`, `NAMAPST2`, `NAMAPST3`, `NAMAPST4`, `NAMAPSTIJASAH`, `GELAR`, `GELARAKTA`, `SKSMAKS`, `SKSMINSP`, `SKSMAKSSP`, `THNSTDMAKS`, `SMTSTDMAKS`, `DIKTIEPS`, `DIKTIEPSJEN`, `JUR`, `FAK`, `NAMAPIMP`, `NIPPIMP`, `KH`, `BARU`, `KODERAGAM`, `KETERANGAN`, `NAMAPSTJEN`, `DIK`, `id_sms`, `AKRENO`, `AKRETHN`, `AKREPER`, `AKREDR`, `AKREKAD`, `AKREKAT`, `AKREINTLEM`, `AKREINTNO`, `AKREINTDR`, `AKREINTSMP`, `CREATEDBY`, `CREATEDDATE`, `MODIFYBY`, `MODIFYDATE`) VALUES
+INSERT INTO `upi_fjp` (`KODEPST`, `KODEPST1`, `KODEPSTB`, `KODEPSTBB`, `KODEPSTK`, `NAMAPST`, `NAMAPSTE`, `JENJANG`, `DIKTI`, `NAMAPST2`, `NAMAPST3`, `NAMAPST4`, `NAMAPSTIJASAH`, `GELAR`, `GELARAKTA`, `SKSMAKS`, `SKSMINSP`, `SKSMAKSSP`, `THNSTDMAKS`, `SMTSTDMAKS`, `DIKTIEPS`, `DIKTIEPSJEN`, `JUR`, `FAK`, `NAMAPIMP`, `NIPPIMP`, `KH`, `BARU`, `KODERAGAM`, `KETERANGAN`, `NAMAPSTJEN`, `DIK`, `id_sms`, `AKRENO`, `AKRETHN`, `AKREPER`, `AKREDR`, `AKREKAD`, `AKREKAT`, `AKREINTLEM`, `AKREINTNO`, `AKREINTDR`, `AKREINTSMP`, `CREATEDBY`, `CREATEDDATE`, `MODIFYBY`, `MODIFYDATE`) VALUES
 	('A001', 'A001', '', '', '', 'AKTA MENGAJAR I', 'AKTA MENGAJAR I', 'D1', '', 'AKTA MENGAJAR I', 'AKTA', 'AKTA MENGAJAR I', 'AKTA MENGAJAR I', '', '', '21', '2', '9', '', '', '', '', 'A00', 'A', 'A0595', '', '', 0, 1, '', 'AKTA MENGAJAR I - D1', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 'OPR009', '24/8/2010 13:05:05'),
 	('A002', 'A002', '', '', '', 'AKTA MENGAJAR II', 'AKTA MENGAJAR II', 'D2', '', 'AKTA MENGAJAR II', 'AKTA', 'AKTA MENGAJAR II', 'AKTA MENGAJAR II', '', 'AII', '21', '2', '9', '', '6', '', '', 'A00', 'A', '', '', '', 0, 1, '', 'AKTA MENGAJAR II - D2', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 'OPR039', '1/8/2007 13:24:57'),
 	('A003', 'A003', '', '', '', 'AKTA MENGAJAR III', 'AKTA MENGAJAR III', 'D3', '', 'AKTA MENGAJAR III', 'AKTA', 'AKTA MENGAJAR III', 'AKTA MENGAJAR III', '', 'AIII', '21', '2', '9', '', '8', '', '', 'A00', 'A', '', '', '', 0, 1, '', 'AKTA MENGAJAR III - D3', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 'OPR039', '1/8/2007 13:25:03'),
@@ -1194,7 +1194,7 @@ INSERT IGNORE INTO `upi_fjp` (`KODEPST`, `KODEPST1`, `KODEPSTB`, `KODEPSTBB`, `K
 	('P5565', 'P5561', 'P5565', 'P556', '', 'Pendidikan Bahasa Indonesia Bagi Penutur Asing', 'INDONESIAN as a FOREIGN LANGUAGE EDUCATION', 'S2', '', 'Pend. Bahasa Indonesia B. Penutur Asing', '', '', '', 'MPD', '', '', '', '', '', '', '88112', '', '', 'P', '', '', '', 1, 5, '', 'Pendidikan Bahasa Indonesia Bagi Penutur Asing - S2', 1, 'C5D14EE6-67CA-40F8-9027-611DC240C06A', '879/SK/BAN-PT/Ak/M/III/2023', '2023', '', '14/3/2023', '14/3/2028', 'Baik Sekali', '', '', '', '', 'SIAK024', '21/9/2022 09:18:43', 'SIAK062', '19/6/2023 13:48:27');
 
 -- Dumping data for table surat_upi.users: ~4 rows (approximately)
-INSERT IGNORE INTO `users` (`id`, `username`, `name`, `email`, `email_verified_at`, `password`, `role`, `fakultas_id`, `remember_token`, `created_at`, `updated_at`) VALUES
+INSERT INTO `users` (`id`, `username`, `name`, `email`, `email_verified_at`, `password`, `role`, `fakultas_id`, `remember_token`, `created_at`, `updated_at`) VALUES
 	(1, '2312109', 'MIRZA ARYA HERDIANSYAH', '2312109@acs-upi.edu', NULL, NULL, 'mahasiswa', 1, '39PIljy0hWnzCM0Tb0SjXU7pTTC9PtbmOWUAs2M0yv2hFiyNmaBwyTHb79ej', '2026-02-28 05:32:32', '2026-03-02 19:14:05'),
 	(2, 'admin', 'Admin Sistem', 'admin@local.test', NULL, '$2y$12$EUDxSNhyPlmMzUFbef3LN.b7axScDb76BKwUjywiHN2F3hEE6kPCm', 'admin', NULL, NULL, '2026-02-28 14:47:21', '2026-02-28 14:47:21'),
 	(3, 'operator_rpl', 'Operator RPL', 'operator_rpl@upi.edu', NULL, '$2y$12$3TheITEmvKDpkbEqSa2bM.3faqGYiaTBY721hzY5gqky7kckYRJ3m', 'operator', 1, NULL, '2026-02-28 14:49:04', '2026-02-28 14:49:04'),
