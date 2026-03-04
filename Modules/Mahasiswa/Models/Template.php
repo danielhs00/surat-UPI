@@ -14,9 +14,14 @@ class Template extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'name','description','docx_path','is_active'
+        'fakultas_id',
+        'uploaded_by',
+        'nama_template',
+        'jenis_surat',
+        'deskripsi',
+        'file_docx_path',
+        'is_active',
     ];
-
     // protected static function newFactory(): TemplateFactory
     // {
     //     // return TemplateFactory::new();

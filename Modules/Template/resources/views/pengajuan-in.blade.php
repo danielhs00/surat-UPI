@@ -1,6 +1,6 @@
 @extends('layouts.mantis')
 
-@section('title', 'Daftarnya Pengajuan Mahasiswa')
+@section('title', 'Daftarnya Pengajuan Surat Mahasiswa')
 @include('components.mantis.header', ['role' => 'operator'])
 
 @section('content')

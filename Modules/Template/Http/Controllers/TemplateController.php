@@ -10,23 +10,6 @@ use Modules\Template\Models\Template;
 class TemplateController extends Controller
 {
 
-    // public function store(Request $request)
-    // {
-    //     // DEBUG: lihat semua data yang diterima
-    //     dd([
-    //         'all_data' => $request->all(),
-    //         'has_file' => $request->hasFile('file_docx'),
-    //         'file_info' => $request->hasFile('file_docx') ? [
-    //             'original_name' => $request->file('file_docx')->getClientOriginalName(),
-    //             'size' => $request->file('file_docx')->getSize(),
-    //             'mime' => $request->file('file_docx')->getMimeType(),
-    //             'error' => $request->file('file_docx')->getError(),
-    //         ] : 'No file',
-    //         'files' => $_FILES,
-    //     ]);
-
-    //     // ... rest of code
-    // }
     public function index()
     {
         $fakultasId = auth()->user()->fakultas_id;

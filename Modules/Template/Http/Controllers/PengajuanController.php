@@ -52,8 +52,9 @@ class PengajuanController extends Controller
      */
     public function edit($id)
     {
-        $pengajuan = StudentDocument::with(['user.mahasiswa.fakultas', 'template'])->findOrFail($id);
-        return view('template::edit', compact('pengajuan'));
+        $pengajuan = StudentDocument::with(['user.mahasiswa', 'template'])->findOrFail($id);
+
+        return view('template::pengajuan.edit', compact('pengajuan'));
     }
 
     public function destroy($id)
@@ -215,11 +216,21 @@ class PengajuanController extends Controller
         $docFakultasId = $doc->template->fakultas_id ?? null;
         abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
 
-        abort_unless($doc->status === 'processing_offline', 403, 'Dokumen belum diproses offline.');
+        $allowed = [
+            'mengupload',
+            'converting',
+            'converted',
+            'submitted',
+            'processing_offline'
+        ];
+
+        abort_unless(in_array($doc->status, $allowed, true), 403, 'Dokumen belum disiapkan.');
 
         $validated = $request->validate([
-            'nomor_surat' => 'required|string|max:255',
-            'signed_pdf'  => 'required|file|mimes:pdf|max:5120',
+            'signed_pdf' => 'nullable|file|mimes:pdf|max:5120',
+            'status' => 'required|in:draft,mengupload,converting,converted,gagal,submitted,processing_offline,completed,rejected',
+            'catatan_operator' => 'nullable|string',
+            'nomor_surat' => 'nullable|string|max:255',
         ]);
 
         $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');

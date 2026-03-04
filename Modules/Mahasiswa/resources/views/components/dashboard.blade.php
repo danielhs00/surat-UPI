@@ -30,7 +30,7 @@
                         <div class="text-muted small mt-1 mb-3">{{ $t->deskripsi ?? '-' }}</div>
 
                         <div class="mt-auto d-flex gap-2">
-                            @if (!empty($t->docx_path))
+                            @if (!empty($t->file_docx_path))
                                 <a class="btn btn-sm btn-outline-primary"
                                    href="{{ route('mahasiswa.templates.download', $t->id) }}">
                                     Download DOCX
