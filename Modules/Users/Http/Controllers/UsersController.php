@@ -90,9 +90,9 @@ class UsersController extends Controller
         return redirect()->route('admin.dashboard')->with('success', 'Operator berhasil ditambahkan.');
     }
 
-    public function editOperator(Operator $operator)
+    public function editOperator($id)
     {
-        $operator->load(['user', 'fakultas', 'prodi']);
+        $operator = Operator::with(['user', 'fakultas', 'prodi'])->findOrFail($id);
         $fakultas = Fakultas::orderBy('nama_fakultas')->get();
 
         return view('users::operator.edit', compact('operator', 'fakultas'));
@@ -123,5 +123,41 @@ class UsersController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    public function updateOperator(\Illuminate\Http\Request $request, $id)
+    {
+        $operator = \App\Models\Operator::with('user')->findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'fakultas_id' => 'required|integer',
+            'prodi_id' => 'required|integer',
+            'password' => 'nullable|min:6|confirmed',
+        ]);
+
+        $operator->user->name  = $request->name;
+        $operator->user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $operator->user->password = bcrypt($request->password);
+        }
+        $operator->user->save();
+
+        $operator->fakultas_id = $request->fakultas_id;
+        $operator->prodi_id    = $request->prodi_id;
+        $operator->save();
+
+        return redirect()->route('admin.dashboard')->with('success', 'Operator berhasil diupdate.');
+    }
+
+    public function deleteOperator($id)
+    {
+        $operator = \App\Models\Operator::findOrFail($id);
+
+        $operator->delete();
+
+        return redirect()->back()->with('success', 'Operator berhasil dihapus.');
     }
 }

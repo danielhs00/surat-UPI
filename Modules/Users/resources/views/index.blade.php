@@ -216,92 +216,65 @@
     @endif
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             const fakultasSelect = document.getElementById('fakultasSelect');
             const prodiSelect = document.getElementById('prodiSelect');
 
-            if (!fakultasSelect || !prodiSelect) {
-                console.error('Elemen tidak ditemukan!');
-                return;
-            }
-
             async function loadProdi(fakultasId, selectedProdiId = null) {
-                prodiSelect.innerHTML = '<option value="">-- Memuat data... --</option>';
+                prodiSelect.innerHTML = `<option value="">-- Memuat data... --</option>`;
                 prodiSelect.disabled = true;
 
                 if (!fakultasId) {
-                    prodiSelect.innerHTML = '<option value="">-- pilih prodi --</option>';
+                    prodiSelect.innerHTML = `<option value="">-- pilih prodi --</option>`;
                     prodiSelect.disabled = false;
                     return;
                 }
 
                 try {
-                    const baseUrl = window.location.origin;
-                    const url = `${baseUrl}/publik/prodi/${fakultasId}`;
+                    // ✅ ini route yang harus kamu sediakan di web.php
+                    const url = `/admin/prodi/by-fakultas/${fakultasId}`;
 
-                    console.log('Fetching dari URL:', url);
-
-                    const response = await fetch(url);
-                    const responseText = await response.text(); // Ambil sebagai text dulu
-
-                    console.log('Response text:', responseText.substring(0, 200)); // Log 200 karakter pertama
-
-                    // Coba parse JSON
-                    try {
-                        const data = JSON.parse(responseText);
-                        console.log('Data prodi:', data);
-
-                        prodiSelect.innerHTML = '<option value="">-- pilih prodi --</option>';
-
-                        if (data && Array.isArray(data) && data.length > 0) {
-                            data.forEach(item => {
-                                const option = document.createElement('option');
-                                option.value = item.id;
-                                option.textContent = item.nama_prodi;
-                                prodiSelect.appendChild(option);
-                            });
-
-                            if (selectedProdiId) {
-                                prodiSelect.value = selectedProdiId;
-                            }
-                        } else {
-                            prodiSelect.innerHTML = '<option value="">-- Tidak ada prodi --</option>';
+                    const res = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json'
                         }
+                    });
 
-                    } catch (parseError) {
-                        console.error('Gagal parse JSON:', parseError);
-                        console.error('Response text:', responseText);
-
-                        // Coba bersihkan response dari HTML tags
-                        const cleanText = responseText.replace(/<[^>]*>/g, '');
-                        try {
-                            const cleanData = JSON.parse(cleanText);
-                            console.log('Data setelah dibersihkan:', cleanData);
-                            // Proses cleanData...
-                        } catch (e) {
-                            prodiSelect.innerHTML = '<option value="">-- Error format data --</option>';
-                        }
+                    const ct = res.headers.get('content-type') || '';
+                    if (!res.ok || !ct.includes('application/json')) {
+                        const text = await res.text();
+                        console.error('Bukan JSON. Response awal:', text.slice(0, 200));
+                        prodiSelect.innerHTML = `<option value="">-- Error format data --</option>`;
+                        return;
                     }
 
-                } catch (error) {
-                    console.error('Error:', error);
-                    prodiSelect.innerHTML = '<option value="">-- Gagal memuat data --</option>';
+                    const data = await res.json();
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        prodiSelect.innerHTML = `<option value="">-- Tidak ada prodi --</option>`;
+                        return;
+                    }
+
+                    prodiSelect.innerHTML = `<option value="">-- pilih prodi --</option>` +
+                        data.map(p => `<option value="${p.id}">${p.nama_prodi}</option>`).join('');
+
+                    if (selectedProdiId) prodiSelect.value = selectedProdiId;
+
+                } catch (err) {
+                    console.error('Fetch prodi error:', err);
+                    prodiSelect.innerHTML = `<option value="">-- Gagal memuat data --</option>`;
                 } finally {
                     prodiSelect.disabled = false;
                 }
             }
 
-            // Event listener untuk perubahan fakultas
-            fakultasSelect.addEventListener('change', function() {
-                loadProdi(this.value);
+            fakultasSelect.addEventListener('change', (e) => {
+                loadProdi(e.target.value);
             });
 
-            // Jika ada old value dari form validation
+            // kalau habis validasi error dan ada old()
             @if (old('fakultas_id'))
-                setTimeout(() => {
-                    fakultasSelect.value = "{{ old('fakultas_id') }}";
-                    loadProdi("{{ old('fakultas_id') }}", "{{ old('prodi_id') }}");
-                }, 500);
+                loadProdi("{{ old('fakultas_id') }}", "{{ old('prodi_id') }}");
             @endif
         });
     </script>
