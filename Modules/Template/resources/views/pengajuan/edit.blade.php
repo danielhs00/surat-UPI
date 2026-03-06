@@ -72,7 +72,7 @@
                             @csrf
                             @method('PUT')
                             <button type="submit" class="btn btn-outline-warning"
-                                onclick="return confirm('Tandai pengajuan ini sebagai Processing Offline?')">
+                                onclick="return confirm('Tandai pengajuan ini sebagai diproses offline?')">
                                 Tandai Diproses Offline
                             </button>
                         </form>
@@ -85,6 +85,7 @@
                 </div>
             </div>
 
+            {{-- Form Simpan + Upload Final (opsional) --}}
             {{-- Form Simpan + Upload Final (opsional) --}}
             <div class="col-md-12">
                 <div class="card">
@@ -116,10 +117,15 @@
                                         @endphp
                                         <select name="status" class="form-control">
                                             @foreach ($statuses as $st)
-                                                <option value="{{ $st }}" @selected($pengajuan->status === $st)>
-                                                    {{ $st }}</option>
+                                                <option value="{{ $st }}" @selected(old('status', $pengajuan->status) === $st)>
+                                                    {{ $st }}
+                                                </option>
                                             @endforeach
                                         </select>
+                                        <div class="form-text">
+                                            Jika kamu upload PDF final dan isi nomor surat, status akan otomatis menjadi
+                                            <b>completed</b>.
+                                        </div>
                                     </div>
 
                                     <div class="mb-3">
@@ -130,28 +136,44 @@
 
                                 <div class="col-md-6">
                                     <div class="alert alert-info">
-                                        Upload di bawah ini <b>opsional</b>. Kalau kamu upload PDF final, sistem akan
-                                        otomatis set status jadi <b>completed</b>.
+                                        <b>Catatan:</b><br>
+                                        Upload PDF final bersifat opsional.<br>
+                                        Namun jika kamu upload PDF final, maka:
+                                        <ul class="mb-0 mt-2">
+                                            <li>Nomor surat wajib diisi</li>
+                                            <li>Status otomatis menjadi <b>completed</b></li>
+                                        </ul>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Nomor Surat (wajib jika upload PDF final)</label>
+                                        <label class="form-label">Nomor Surat</label>
                                         <input type="text" name="nomor_surat" class="form-control"
                                             value="{{ old('nomor_surat', $pengajuan->nomor_surat) }}"
                                             placeholder="Contoh: 123/UN40/KM.00.00/2026">
+                                        <div class="form-text">
+                                            Wajib diisi jika upload PDF final.
+                                        </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label">PDF Final (sudah TTD)</label>
                                         <input type="file" name="signed_pdf" class="form-control"
                                             accept="application/pdf">
-                                        <div class="form-text">Max 5MB (sesuai validator controller).</div>
+                                        <div class="form-text">
+                                            Format PDF, maksimal 5MB.
+                                        </div>
                                     </div>
+
+                                    @if ($pengajuan->signed_pdf_path)
+                                        <div class="mb-3">
+                                            <span class="badge bg-success">PDF Final sudah tersedia</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
                             <button type="submit" class="btn btn-primary"
-                                onclick="return confirm('Simpan perubahan? Jika ada PDF final, status akan jadi completed.')">
+                                onclick="return confirm('Simpan perubahan? Jika upload PDF final dan nomor surat diisi, status akan otomatis menjadi completed.')">
                                 Simpan Perubahan
                             </button>
 
@@ -163,4 +185,21 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfInput = document.querySelector('input[name="signed_pdf"]');
+            const nomorInput = document.querySelector('input[name="nomor_surat"]');
+
+            if (pdfInput && nomorInput) {
+                pdfInput.addEventListener('change', function() {
+                    if (pdfInput.files.length > 0) {
+                        nomorInput.setAttribute('required', 'required');
+                    } else {
+                        nomorInput.removeAttribute('required');
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

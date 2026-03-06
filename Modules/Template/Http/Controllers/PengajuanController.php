@@ -4,11 +4,12 @@ namespace Modules\Template\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Modules\Mahasiswa\Models\StudentDocument;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Operator;
 use App\Models\Wadek;
+use Symfony\Component\HttpFoundation\Response;
 
 class PengajuanController extends Controller
 {
@@ -37,9 +38,7 @@ class PengajuanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-    }
+    public function store(Request $request) {}
 
     /**
      * Show the specified resource.
@@ -149,18 +148,18 @@ class PengajuanController extends Controller
     {
         abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
 
-        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        $op = \App\Models\Operator::where('user_id', auth()->id())->first();
         abort_unless($op, 403, 'Data operator tidak ditemukan');
 
         $doc = StudentDocument::with(['template'])->findOrFail($id);
 
+        // operator hanya boleh ubah dokumen fakultasnya
         $docFakultasId = $doc->template->fakultas_id ?? null;
         abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
-        $allowedStatuses = ['mengupload', 'converting', 'converted', 'submitted'];
-
-        if (!in_array($doc->status, $allowedStatuses, true)) {
-            return back()->with('error', 'Status saat ini: ' . $doc->status . '. Dokumen belum siap diproses offline.');
+        // cegah kalau status sudah final
+        if (in_array($doc->status, ['completed', 'rejected'], true)) {
+            return back()->with('error', 'Dokumen dengan status final tidak bisa diubah ke proses offline.');
         }
 
         $doc->status = 'processing_offline';
@@ -173,7 +172,7 @@ class PengajuanController extends Controller
 
         return redirect()
             ->route('operator.pengajuan.edit', $doc->id)
-            ->with('success', 'Ditandai: Diproses Offline.');
+            ->with('success', 'Berhasil update status di proses offline.');
     }
 
     public function viewPdf($id)
@@ -211,23 +210,13 @@ class PengajuanController extends Controller
     {
         abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
 
-        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        $op = \App\Models\Operator::where('user_id', auth()->id())->first();
         abort_unless($op, 403, 'Data operator tidak ditemukan');
 
         $doc = StudentDocument::with(['template'])->findOrFail($id);
 
         $docFakultasId = $doc->template->fakultas_id ?? null;
         abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
-
-        $allowed = [
-            'mengupload',
-            'converting',
-            'converted',
-            'submitted',
-            'processing_offline'
-        ];
-
-        abort_unless(in_array($doc->status, $allowed, true), 403, 'Dokumen belum disiapkan.');
 
         $validated = $request->validate([
             'signed_pdf' => 'nullable|file|mimes:pdf|max:5120',
@@ -236,19 +225,10 @@ class PengajuanController extends Controller
             'nomor_surat' => 'nullable|string|max:255',
         ]);
 
-        // default pakai file lama jika tidak upload baru
-        $path = $doc->signed_pdf_path;
-
-        // kalau upload file baru, simpan file baru
-        if ($request->hasFile('signed_pdf')) {
-            $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');
-        }
-
+        // update field umum
         $doc->catatan_operator = $validated['catatan_operator'] ?? null;
-        $doc->nomor_surat = $validated['nomor_surat'] ?? null;
-        $doc->signed_pdf_path = $path;
 
-        // kalau upload PDF final, otomatis completed
+        // kalau upload PDF final
         if ($request->hasFile('signed_pdf')) {
             if (empty($validated['nomor_surat'])) {
                 return back()
@@ -256,18 +236,31 @@ class PengajuanController extends Controller
                     ->withInput();
             }
 
+            $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');
+
+            $doc->signed_pdf_path = $path;
+            $doc->nomor_surat = $validated['nomor_surat'];
             $doc->status = 'completed';
             $doc->approved_at = now();
             $doc->approved_by = auth()->id();
             $doc->hidden_in_dashboard = 0;
-        } else {
-            // kalau tidak upload file, ikuti status dari form
-            $doc->status = $validated['status'];
+
+            $doc->save();
+
+            return redirect()
+                ->route('operator.pengajuan.edit', $doc->id)
+                ->with('success', 'PDF final berhasil diupload dan status otomatis menjadi completed.');
         }
 
-        // cegah completed jika belum ada pdf final sama sekali
+        // kalau tidak upload PDF final, simpan normal
+        $doc->nomor_surat = $validated['nomor_surat'] ?? $doc->nomor_surat;
+        $doc->status = $validated['status'];
+
+        // cegah completed tanpa PDF final
         if ($doc->status === 'completed' && empty($doc->signed_pdf_path)) {
-            return back()->with('error', 'Tidak bisa set completed sebelum upload PDF final.');
+            return back()
+                ->with('error', 'Tidak bisa set completed sebelum upload PDF final.')
+                ->withInput();
         }
 
         $doc->save();
