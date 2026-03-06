@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Prodi</title>
+</head>
+<body>
+    <h3>Test Fetch Prodi (Publik)</h3>
+    
+    <select id="fakultas">
+        <option value="">-- Pilih Fakultas --</option>
+        <option value="4">Fakultas Ilmu Pendidikan</option>
+        <option value="5">FPIPS</option>
+        <option value="6">FPBS</option>
+        <option value="7">FPMIPA</option>
+    </select>
+    
+    <select id="prodi">
+        <option value="">-- Pilih Prodi --</option>
+    </select>
+
+    <div id="debug" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f5f5f5;">
+        <h4>Debug Info:</h4>
+        <pre id="debugInfo">Belum ada aktivitas</pre>
+    </div>
+    
+    <script>
+    document.getElementById('fakultas').addEventListener('change', async function() {
+        const fakultasId = this.value;
+        const prodiSelect = document.getElementById('prodi');
+        const debugInfo = document.getElementById('debugInfo');
+        
+        if (!fakultasId) {
+            prodiSelect.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+            debugInfo.textContent = 'Pilih fakultas terlebih dahulu';
+            return;
+        }
+        
+        prodiSelect.innerHTML = '<option value="">Loading...</option>';
+        debugInfo.textContent = `Mengambil data untuk fakultas ID: ${fakultasId}...`;
+        
+        try {
+            const url = `/publik/prodi/${fakultasId}`;
+            debugInfo.textContent += `\nFetching dari: ${url}`;
+            
+            const response = await fetch(url);
+            
+            debugInfo.textContent += `\nResponse status: ${response.status} ${response.statusText}`;
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            debugInfo.textContent += `\nData diterima: ${JSON.stringify(data, null, 2)}`;
+            
+            console.log('Data lengkap:', data);
+            
+            // Kosongkan dropdown
+            prodiSelect.innerHTML = '<option value="">-- Pilih Prodi --</option>';
+            
+            // Cek apakah data adalah array
+            if (Array.isArray(data)) {
+                if (data.length === 0) {
+                    prodiSelect.innerHTML = '<option value="">Tidak ada prodi</option>';
+                    debugInfo.textContent += '\nData array kosong';
+                } else {
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        // Cek properti yang tersedia
+                        option.textContent = item.nama_prodi || item.name || item.nama || 'Unknown';
+                        prodiSelect.appendChild(option);
+                    });
+                    debugInfo.textContent += `\nBerhasil memuat ${data.length} prodi`;
+                }
+            } else {
+                debugInfo.textContent += `\nData bukan array: ${typeof data}`;
+                prodiSelect.innerHTML = '<option value="">Format data tidak sesuai</option>';
+            }
+            
+        } catch (error) {
+            console.error('Error detail:', error);
+            debugInfo.textContent += `\nERROR: ${error.message}\nStack: ${error.stack}`;
+            prodiSelect.innerHTML = '<option value="">Error loading</option>';
+        }
+    });
+    </script>
+</body>
+</html>

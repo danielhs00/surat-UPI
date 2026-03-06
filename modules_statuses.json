@@ -1,0 +1,11 @@
+{
+    "Auth": true,
+    "Users": true,
+    "Template": true,
+    "Persetujuan": true,
+    "Master": true,
+    "Surat": true,
+    "Mahasiswa": true,
+    "Footer": true,
+    "Wadek": true
+}
