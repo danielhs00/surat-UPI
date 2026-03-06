@@ -15,6 +15,11 @@
 @endphp
 
 <div>
+    <div class="loader-bg">
+    <div class="loader-track">
+        <div class="loader-fill"></div>
+    </div>
+</div>
     <header class="pc-header">
         <div class="header-wrapper"> <!-- [Mobile Media Block] start -->
             <div class="me-auto pc-mob-drp">
@@ -147,3 +152,8 @@
         </div>
     </header>
 </div>
+<script src="{{ asset('dist/assets/js/plugins/feather.min.js') }}"></script>
+<script src="{{ asset('dist/assets/js/plugins/simplebar.min.js') }}"></script>
+<script src="{{ asset('dist/assets/js/plugins/popper.min.js') }}"></script>
+<script src="{{ asset('dist/assets/js/plugins/bootstrap.min.js') }}"></script>
+<script src="{{ asset('dist/assets/js/pcoded.js') }}"></script>

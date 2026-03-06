@@ -4,23 +4,6 @@
 @include('components.mantis.header', ['role' => 'operator'])
 
 @section('content')
-    <div class="pc-content">
-        <!-- [ breadcrumb ] start -->
-        <div class="page-header">
-            <div class="page-block">
-                <div class="row align-items-center">
-                    <div class="col-md-12">
-                        <div class="page-header-title">
-                            <h5 class="m-b-10">Manajemen Template Surat</h5>
-                        </div>
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('operator.dashboard') }}">Dashboard</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Template Surat</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
         <!-- [ breadcrumb ] end -->
 
         <!-- [ Main Content ] start -->
@@ -135,8 +118,7 @@
                                             </td>
                                             <td>
                                                 <div>{{ $template->created_at->format('d M Y') }}</div>
-                                                <small class="text-muted">{{ $template->created_at->format('H:i') }}
-                                                    WIB</small>
+                                                
                                             </td>
                                             <td class="text-center">
                                                 <div class="btn-group" role="group">
