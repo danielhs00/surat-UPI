@@ -3,11 +3,10 @@
         <div class="footer-wrapper container-fluid">
             <div class="row">
                 <div class="col-sm my-1">
-                    <p class="m-0">Mantis &#9829; crafted by Team <a href="https://themeforest.net/user/codedthemes"
-                            target="_blank">Codedthemes</a></p>
+                    <p class="m-0">Dibuat oleh Daniel dan Mirza</p>
                 </div>
                 <div class="col-sm my-1">
-                    <p class="m-0">Distributed by <a href="https://themewagon.com" target="_blank">ThemeWagon</a>
+                    <p class="m-0">Surat UPI
                     </p>
                 </div>
                 <div class="col-auto my-1">

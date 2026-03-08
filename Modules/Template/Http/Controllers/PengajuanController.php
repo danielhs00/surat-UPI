@@ -4,11 +4,12 @@ namespace Modules\Template\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Modules\Mahasiswa\Models\StudentDocument;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Operator;
 use App\Models\Wadek;
+use Symfony\Component\HttpFoundation\Response;
 
 class PengajuanController extends Controller
 {
@@ -52,8 +53,9 @@ class PengajuanController extends Controller
      */
     public function edit($id)
     {
-        $pengajuan = StudentDocument::with(['user.mahasiswa.fakultas', 'template'])->findOrFail($id);
-        return view('template::edit', compact('pengajuan'));
+        $pengajuan = StudentDocument::with(['user.mahasiswa', 'template'])->findOrFail($id);
+
+        return view('template::pengajuan.edit', compact('pengajuan'));
     }
 
     public function destroy($id)
@@ -67,7 +69,7 @@ class PengajuanController extends Controller
 
         // operator hanya boleh hapus dokumen fakultasnya
         $docFakultasId = $doc->template->fakultas_id ?? null;
-        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+        abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
         $disk = Storage::disk('local');
 
@@ -82,8 +84,10 @@ class PengajuanController extends Controller
         // hapus file versi (kalau kamu punya relasi versions)
         if (method_exists($doc, 'versions')) {
             foreach ($doc->versions as $v) {
-                if (!empty($v->docx_path) && $disk->exists($v->docx_path)) $disk->delete($v->docx_path);
-                if (!empty($v->pdf_path) && $disk->exists($v->pdf_path)) $disk->delete($v->pdf_path);
+                if (!empty($v->docx_path) && $disk->exists($v->docx_path))
+                    $disk->delete($v->docx_path);
+                if (!empty($v->pdf_path) && $disk->exists($v->pdf_path))
+                    $disk->delete($v->pdf_path);
             }
             $doc->versions()->delete();
         }
@@ -144,23 +148,22 @@ class PengajuanController extends Controller
     {
         abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
 
-        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        $op = \App\Models\Operator::where('user_id', auth()->id())->first();
         abort_unless($op, 403, 'Data operator tidak ditemukan');
 
         $doc = StudentDocument::with(['template'])->findOrFail($id);
 
+        // operator hanya boleh ubah dokumen fakultasnya
         $docFakultasId = $doc->template->fakultas_id ?? null;
-        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+        abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
-        // boleh ditandai offline jika sudah siap (silakan sesuaikan)
-        if (!in_array($doc->status, ['converted', 'submitted', 'mengupload'], true)) {
-            return back()->with('error', 'Dokumen belum siap diproses offline.');
+        // cegah kalau status sudah final
+        if (in_array($doc->status, ['completed', 'rejected'], true)) {
+            return back()->with('error', 'Dokumen dengan status final tidak bisa diubah ke proses offline.');
         }
 
         $doc->status = 'processing_offline';
 
-        // pakai kolom yang sudah ada:
-        // submitted_at kita manfaatkan sebagai "mulai diproses operator"
         if (empty($doc->submitted_at)) {
             $doc->submitted_at = now();
         }
@@ -169,7 +172,7 @@ class PengajuanController extends Controller
 
         return redirect()
             ->route('operator.pengajuan.edit', $doc->id)
-            ->with('success', 'Ditandai: Diproses Offline (menunggu TTD wadek + nomor surat).');
+            ->with('success', 'Berhasil update status di proses offline.');
     }
 
     public function viewPdf($id)
@@ -207,40 +210,64 @@ class PengajuanController extends Controller
     {
         abort_unless(auth()->check() && auth()->user()->role === 'operator', 403);
 
-        $op = \App\Models\operator::where('user_id', auth()->id())->first();
+        $op = \App\Models\Operator::where('user_id', auth()->id())->first();
         abort_unless($op, 403, 'Data operator tidak ditemukan');
 
         $doc = StudentDocument::with(['template'])->findOrFail($id);
 
         $docFakultasId = $doc->template->fakultas_id ?? null;
-        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
-
-        abort_unless($doc->status === 'processing_offline', 403, 'Dokumen belum diproses offline.');
+        abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
         $validated = $request->validate([
-            'nomor_surat' => 'required|string|max:255',
-            'signed_pdf'  => 'required|file|mimes:pdf|max:5120',
+            'signed_pdf' => 'nullable|file|mimes:pdf|max:5120',
+            'status' => 'required|in:draft,mengupload,converting,converted,gagal,submitted,processing_offline,completed,rejected',
+            'catatan_operator' => 'nullable|string',
+            'nomor_surat' => 'nullable|string|max:255',
         ]);
 
-        $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');
+        // update field umum
+        $doc->catatan_operator = $validated['catatan_operator'] ?? null;
 
-        $doc->nomor_surat   = $validated['nomor_surat'];
-        $doc->signed_pdf_path = $path;
+        // kalau upload PDF final
+        if ($request->hasFile('signed_pdf')) {
+            if (empty($validated['nomor_surat'])) {
+                return back()
+                    ->withErrors(['nomor_surat' => 'Nomor surat wajib diisi jika upload PDF final.'])
+                    ->withInput();
+            }
 
-        // selesai versi operator
-        $doc->nomor_surat = $validated['nomor_surat'];
-        $doc->signed_pdf_path = $path;
-        $doc->status = 'completed';
-        $doc->approved_at = now();
-        $doc->approved_by = auth()->id();
+            $path = $request->file('signed_pdf')->store('signed_pdfs', 'local');
 
-        $doc->hidden_in_dashboard = 0; // WAJIB
+            $doc->signed_pdf_path = $path;
+            $doc->nomor_surat = $validated['nomor_surat'];
+            $doc->status = 'completed';
+            $doc->approved_at = now();
+            $doc->approved_by = auth()->id();
+            $doc->hidden_in_dashboard = 0;
+
+            $doc->save();
+
+            return redirect()
+                ->route('operator.pengajuan.edit', $doc->id)
+                ->with('success', 'PDF final berhasil diupload dan status otomatis menjadi completed.');
+        }
+
+        // kalau tidak upload PDF final, simpan normal
+        $doc->nomor_surat = $validated['nomor_surat'] ?? $doc->nomor_surat;
+        $doc->status = $validated['status'];
+
+        // cegah completed tanpa PDF final
+        if ($doc->status === 'completed' && empty($doc->signed_pdf_path)) {
+            return back()
+                ->with('error', 'Tidak bisa set completed sebelum upload PDF final.')
+                ->withInput();
+        }
 
         $doc->save();
 
         return redirect()
             ->route('operator.pengajuan.edit', $doc->id)
-            ->with('success', 'Surat final berhasil diupload. Mahasiswa sekarang bisa melihat/unduh di website.');
+            ->with('success', 'Perubahan berhasil disimpan.');
     }
 
     public function viewPdfOperator($id)
@@ -254,7 +281,7 @@ class PengajuanController extends Controller
 
         // operator hanya boleh lihat dokumen fakultasnya
         $docFakultasId = $doc->template->fakultas_id ?? null;
-        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+        abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
         // ambil PDF yang sudah dittd dulu, kalau belum ada baru pakai pdf biasa
         $path = $doc->signed_pdf_path ?: $doc->pdf_path;
@@ -280,7 +307,7 @@ class PengajuanController extends Controller
         $doc = StudentDocument::with(['template'])->findOrFail($id);
 
         $docFakultasId = $doc->template->fakultas_id ?? null;
-        abort_unless($docFakultasId && (int)$docFakultasId === (int)$op->fakultas_id, 403);
+        abort_unless($docFakultasId && (int) $docFakultasId === (int) $op->fakultas_id, 403);
 
         abort_unless($doc->docx_path, 404, 'DOCX belum tersedia');
         abort_unless(Storage::disk('local')->exists($doc->docx_path), 404, 'File DOCX tidak ditemukan');

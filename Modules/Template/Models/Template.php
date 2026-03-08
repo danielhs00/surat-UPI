@@ -17,7 +17,7 @@ class Template extends Model
         'nama_template',
         'jenis_surat',
         'deskripsi',
-        'file_docx_path', // Diubah dari google_docs_url
+        'file_docx_path', 
         'is_active'
     ];
 

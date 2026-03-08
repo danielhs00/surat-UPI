@@ -18,22 +18,16 @@ class StudentDocumentController extends Controller
     use AuthorizesRequests;
     public function downloadTemplate(Template $template)
     {
-        $path = $document->signed_pdf_path ?: $document->pdf_path;
+        // pastikan template aktif (opsional)
+        abort_unless($template->is_active, 404);
 
-        abort_unless($path, 404);
-        abort_unless(Storage::disk('local')->exists($path), 404);
+        $path = $template->file_docx_path; // sesuai yang disimpan operator
 
-        $filename = ($document->title ?: 'document') . '.pdf';
-        return Storage::disk('local')->download($path, $filename);
+        abort_unless($path, 404, 'File template tidak ditemukan');
+        abort_unless(Storage::disk('public')->exists($path), 404, 'File template tidak ditemukan di storage');
 
-        $url = $template->google_docs_url;
-
-        if ($url && preg_match('~/document/d/([a-zA-Z0-9_-]+)~', $url, $m)) {
-            $docId = $m[1];
-            return redirect()->away("https://docs.google.com/document/d/{$docId}/export?format=docx");
-        }
-
-        abort(404);
+        $filename = str_replace(' ', '_', ($template->nama_template ?? 'template')) . '.docx';
+        return Storage::disk('public')->download($path, $filename);
     }
 
     public function uploadDocx(Request $request, StudentDocument $document)

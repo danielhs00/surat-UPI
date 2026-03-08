@@ -16,5 +16,6 @@
     <!-- [Template CSS Files] -->
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/css/style.css" id="main-style-link">
     <link rel="stylesheet" href="{{ asset('dist') }}/assets/css/style-preset.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
     
 </div>

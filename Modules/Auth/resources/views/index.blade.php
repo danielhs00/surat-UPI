@@ -49,7 +49,7 @@
         <div class="auth-wrapper v3">
             <div class="auth-form">
                 <div class="auth-header">
-                    <a href="#"><img src="{{ asset('dist') }}/assets/images/logo-dark.svg" alt="img"></a>
+                    <a href="#"><img src="{{ asset('dist') }}/assets/images/logo-dark.svg" alt="img" width="50px"></a>
                 </div>
                 <div class="card my-5">
                     <div class="card-body">

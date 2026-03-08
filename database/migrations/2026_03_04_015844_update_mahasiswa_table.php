@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::table('mahasiswa', function (Blueprint $table) {
 
-            $table->dropColumn('angkatan');
+            if (Schema::hasColumn('mahasiswa', 'angkatan')) {
+                $table->dropColumn('angkatan');
+            }
             $table->dropColumn('prodi');
 
             $table->foreignId('prodi_id')
-                  ->after('fakultas_id')
-                  ->constrained('prodi')
-                  ->cascadeOnDelete();
+                ->after('fakultas_id')
+                ->constrained('prodi')
+                ->cascadeOnDelete();
         });
     }
 

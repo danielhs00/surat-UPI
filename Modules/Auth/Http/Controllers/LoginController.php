@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Subfission\Cas\Facades\Cas;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cookie;
 
 use App\Models\User;
+use Modules\Master\Models\Fakultas;
 
 class LoginController extends Controller
 {
@@ -21,7 +24,13 @@ class LoginController extends Controller
     public function startMahasiswaLogin()
     { 
         session(['cas_role' => 'mahasiswa']);
-        return redirect()->route('cas.login');
+
+        $service  = rtrim(config('app.url'), '/') . '/cas/login';
+        $casLogin = env('cas_login_url', 'https://sso.upi.edu/cas/login');
+
+        return redirect()->away(
+            $casLogin . '?service=' . urlencode($service) . '&renew=true'
+        );
     }
     public function startOperatorLogin()
     {
@@ -79,7 +88,6 @@ public function casLogin(Request $request)
 
     if (!Cas::isAuthenticated()) {
         $redirect = $casLogin . '?service=' . urlencode($service);
-
         return redirect()->away($redirect);
     }
 
@@ -88,46 +96,97 @@ public function casLogin(Request $request)
 
     Log::info('CAS: authenticated', ['username' => $username, 'attrs' => $attrs]);
 
-    // ambil attribute
     $email = $attrs['mail'] ?? $attrs['email'] ?? ($username . '@sso.local');
+    $nama  = $attrs['simpleName'] ?? $attrs['cn'] ?? $username;
 
-    $nama = 
-        $attrs['simpleName'] ??
-        $attrs['cn'] ??
-        $username;
+    // default untuk kolom NOT NULL di tabel mahasiswa
+    $defaultFakultasId = 1;
+    $defaultProdi      = '1';
+    $idprodi = 1; // ganti jadi 1 / 0 kalau kolom prodi kamu numeric
 
-    $fakultasId = $attrs['fakultas_id'] ?? null;
-
-    // simpan ke database
+    // 1) simpan/update user dulu
     $user = \App\Models\User::updateOrCreate(
         ['username' => $username],
         [
             'name'        => $nama,
             'email'       => $email,
-            'fakultas_id' => $fakultasId,
+            'fakultas_id' => $defaultFakultasId,
+            'prodi'       => $defaultProdi,
+            'prodi_id'    => $idprodi,
         ]
     );
 
-    \Illuminate\Support\Facades\Auth::login($user, true);
+    // 2) cari kode prodi dari CAS (kalau ada)
+    $kodeProdi = $attrs['KODEPST']
+        ?? $attrs['kodeProdi']
+        ?? $attrs['prodi']
+        ?? null;
+
+    // ambil record mahasiswa lama (kalau ada)
+    $mhsOld = \App\Models\Mahasiswa::where('user_id', $user->id)->first();
+
+    // kalau CAS tidak punya prodi, pakai prodi yg sudah tersimpan
+    if (!$kodeProdi && $mhsOld && !empty($mhsOld->prodi)) {
+        $kodeProdi = $mhsOld->prodi;
+    }
+
+    // prodi final: WAJIB ADA
+    $prodiFinal = $kodeProdi ?: $defaultProdi;
+
+    // 3) mapping fakultas dari upi_fjp + upi_fak (kalau punya kode prodi yang valid)
+    $mappedFakultasId = null;
+
+    // hanya mapping kalau prodiFinal bukan default "UNKNOWN"
+    if ($prodiFinal && $prodiFinal !== $defaultProdi) {
+        $rowProdi = DB::table('upi_fjp')->where('KODEPST', $prodiFinal)->first();
+
+        if ($rowProdi && !empty($rowProdi->FAK)) {
+            $rowFak = DB::table('upi_fak')->where('FAK', $rowProdi->FAK)->first();
+
+            if ($rowFak) {
+                $fak = \App\Models\Fakultas::firstOrCreate(
+                    ['kode' => $rowFak->FAK],
+                    ['nama' => $rowFak->NAMAFAK4]
+                );
+
+                $mappedFakultasId = $fak->id;
+            }
+        }
+    }
+
+    $fakultasIdFinal = $mappedFakultasId ?: $defaultFakultasId;
+
+    // 4) update/create mahasiswa (WAJIB set fakultas_id & prodi)
+    \App\Models\Mahasiswa::updateOrCreate(
+        ['user_id' => $user->id],
+        [
+            'nim'         => $username,
+            'fakultas_id' => $fakultasIdFinal,
+            'prodi'       => $defaultProdi,
+            'prodi_id'    => $idprodi,
+        ]
+    );
+
+    // 5) update user fakultas_id biar konsisten
+    $user->update(['fakultas_id' => $fakultasIdFinal]);
+
+    Auth::login($user);
 
     return redirect()->route('mahasiswa.dashboard');
 }
 
-  public function destroy(Request $request)
+public function destroy(Request $request)
 {
-    // 1️⃣ Logout Laravel
-    Auth::logout();
+    Auth::guard('web')->logout();
 
-    // 2️⃣ Hapus session Laravel
+    $request->session()->flush();
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    // 3️⃣ Hancurkan session CAS lokal (penting!)
-    \Subfission\Cas\Facades\Cas::logout();
-
-    // 4️⃣ Redirect ke CAS logout dan kembali ke halaman login
+    // CAS akan redirect otomatis ke homepage app kamu
     return redirect()->away(
-        'https://sso.upi.edu/cas/logout?service=' . urlencode(route('login'))
+        'https://sso.upi.edu/cas/logout?url=' . urlencode(url('/?logout=1'))
     );
 }
+
 }

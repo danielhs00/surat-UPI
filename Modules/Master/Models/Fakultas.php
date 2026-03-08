@@ -29,11 +29,6 @@ class Fakultas extends Model
         return $this->hasOne(\App\Models\Operator::class);
     }
 
-    public function wadek()
-    {
-        return $this->hasOne(\App\Models\Wadek::class);
-    }
-
     protected static function newFactory()
     {
         return \Modules\Master\Database\Factories\FakultasFactory::new();
